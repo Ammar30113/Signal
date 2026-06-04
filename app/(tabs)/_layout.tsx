@@ -1,34 +1,105 @@
-import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { Tabs } from "expo-router";
+import { Text, View } from "react-native";
 
 import { theme } from "@/constants/theme";
 
+function TabMark({
+  label,
+  focused,
+  danger,
+}: {
+  label: string;
+  focused: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <View
+      style={{
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: focused ? (danger ? theme.colors.red : theme.colors.gold) : "transparent",
+        borderWidth: 1,
+        borderColor: focused ? (danger ? theme.colors.red : theme.colors.gold) : theme.colors.borderStrong,
+      }}
+    >
+      <Text
+        style={{
+          color: focused ? theme.colors.background : theme.colors.muted,
+          fontSize: 12,
+          fontWeight: "900",
+        }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
 export default function TabLayout() {
   return (
-    <NativeTabs tintColor={theme.colors.gold} backgroundColor={theme.colors.backgroundSoft}>
-      <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Icon sf={{ default: "gauge.open.with.lines.needle.33percent", selected: "gauge.open.with.lines.needle.33percent" }} md="dashboard" />
-        <NativeTabs.Trigger.Label>Dashboard</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="check-in">
-        <NativeTabs.Trigger.Icon sf={{ default: "waveform.path.ecg", selected: "waveform.path.ecg" }} md="ecg_heart" />
-        <NativeTabs.Trigger.Label>Check-In</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="pattern">
-        <NativeTabs.Trigger.Icon sf={{ default: "map", selected: "map.fill" }} md="map" />
-        <NativeTabs.Trigger.Label>Pattern</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="identity">
-        <NativeTabs.Trigger.Icon sf={{ default: "safari", selected: "safari.fill" }} md="explore" />
-        <NativeTabs.Trigger.Label>Identity</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="sos">
-        <NativeTabs.Trigger.Icon sf={{ default: "exclamationmark.octagon", selected: "exclamationmark.octagon.fill" }} md="emergency_home" />
-        <NativeTabs.Trigger.Label>SOS</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="settings">
-        <NativeTabs.Trigger.Icon sf={{ default: "gearshape", selected: "gearshape.fill" }} md="settings" />
-        <NativeTabs.Trigger.Label>Privacy</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: theme.colors.gold,
+        tabBarInactiveTintColor: theme.colors.muted,
+        tabBarStyle: {
+          backgroundColor: theme.colors.backgroundSoft,
+          borderTopColor: theme.colors.border,
+          minHeight: 72,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "700",
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Dashboard",
+          tabBarIcon: ({ focused }) => <TabMark label="D" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="check-in"
+        options={{
+          title: "Check-In",
+          tabBarIcon: ({ focused }) => <TabMark label="C" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="pattern"
+        options={{
+          title: "Pattern",
+          tabBarIcon: ({ focused }) => <TabMark label="P" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="identity"
+        options={{
+          title: "Identity",
+          tabBarIcon: ({ focused }) => <TabMark label="I" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="sos"
+        options={{
+          title: "SOS",
+          tabBarActiveTintColor: theme.colors.red,
+          tabBarIcon: ({ focused }) => <TabMark label="!" focused={focused} danger />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Privacy",
+          tabBarIcon: ({ focused }) => <TabMark label="S" focused={focused} />,
+        }}
+      />
+    </Tabs>
   );
 }
