@@ -2,6 +2,8 @@ export type UrgeState = "green" | "yellow" | "red";
 
 export type RiskTrend = "falling" | "stable" | "rising";
 
+export type EntitlementPlan = "free" | "pro";
+
 export type Trigger =
   | "Boredom"
   | "Loneliness"
@@ -41,7 +43,8 @@ export type PatternInsightKind =
   | "vulnerability"
   | "script"
   | "time"
-  | "milestone";
+  | "milestone"
+  | "action";
 
 export interface PatternInsight {
   id: string;
@@ -75,6 +78,34 @@ export interface CheckInResult {
   nextStep: string;
 }
 
+export interface CheckInEntry {
+  id: string;
+  createdAt: string;
+  answer: CheckInAnswer;
+  result: CheckInResult;
+}
+
+export interface TriggerProfile {
+  trigger: Trigger;
+  count: number;
+  averageRisk: number;
+  lastSeenAt?: string;
+}
+
+export interface InterventionSession {
+  id: string;
+  createdAt: string;
+  completedAt?: string;
+  durationSeconds: number;
+  selectedAction: EmergencyAction;
+  emotion: string;
+  trigger: Trigger;
+  intensityBefore: number;
+  intensityAfter?: number;
+  reflection?: string;
+  completed: boolean;
+}
+
 export interface SlipReview {
   id: string;
   createdAt: string;
@@ -94,4 +125,50 @@ export interface SignalSnapshot {
   topTrigger: Trigger;
   progressDays: number;
   lastCheckInSummary: string;
+}
+
+export interface PatternAggregate {
+  insights: PatternInsight[];
+  topTriggers: TriggerProfile[];
+  emotionTriggerPairs: Array<{
+    emotion: string;
+    trigger: Trigger;
+    count: number;
+  }>;
+  topRationalizations: Array<{
+    script: RationalizationScript;
+    count: number;
+  }>;
+  successfulRedirectActions: Array<{
+    action: EmergencyAction;
+    count: number;
+    averageDrop: number;
+  }>;
+  dangerWindows: Array<{
+    label: string;
+    count: number;
+  }>;
+  milestoneDangerDays: number[];
+  totals: {
+    checkIns: number;
+    interventions: number;
+    completedInterventions: number;
+    slipReviews: number;
+  };
+}
+
+export interface UserSettings {
+  remindersEnabled: boolean;
+  highRiskReminders: boolean;
+  discreetMode: boolean;
+  appLockEnabled: boolean;
+  analyticsConsent: boolean;
+  protocolDurationSeconds: number;
+}
+
+export interface Entitlement {
+  plan: EntitlementPlan;
+  source: "local" | "revenuecat";
+  lastCheckedAt?: string;
+  expiresAt?: string;
 }

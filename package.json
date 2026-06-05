@@ -9,6 +9,7 @@
     "expo-haptics": "~56.0.3",
     "expo-linking": "~56.0.13",
     "expo-router": "~56.2.8",
+    "expo-sqlite": "~56.0.4",
     "expo-status-bar": "~56.0.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "tsx": "^4.22.4",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -28,6 +30,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "test:logic": "tsx tests/signal-engine.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "private": true

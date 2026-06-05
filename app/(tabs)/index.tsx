@@ -26,12 +26,12 @@ function getDateLabel() {
 }
 
 export default function DashboardScreen() {
-  const { snapshot, redirects, updateIntensity, slipReviews } = useSignal();
+  const { snapshot, redirects, updateIntensity, slipReviews, checkIns, patternAggregate, entitlement } = useSignal();
   const current = stateTheme[snapshot.currentState];
 
   return (
     <Screen>
-      <Header eyebrow={getDateLabel()} title={getGreeting()} detail="Signal is watching the sequence, not judging the moment." />
+      <Header eyebrow={getDateLabel()} title={getGreeting()} detail="Private 10-minute interruption for urges, loops, and drift." />
 
       <StateCard
         state={snapshot.currentState}
@@ -47,6 +47,15 @@ export default function DashboardScreen() {
         </Row>
         <ProgressBar value={snapshot.riskScore} color={current.accent} />
         <AppText style={{ color: theme.colors.muted }}>{snapshot.lastCheckInSummary}</AppText>
+      </Card>
+
+      <Card accentColor={theme.colors.gold}>
+        <SectionTitle title="10-minute protocol" detail="Your method, built into the product loop." />
+        <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+          <Metric label="Check-ins" value={`${checkIns.length}`} detail="saved locally" />
+          <Metric label="SOS done" value={`${patternAggregate.totals.completedInterventions}`} detail="completed" accentColor={theme.colors.green} />
+          <Metric label="Plan" value={entitlement.plan.toUpperCase()} detail="panic tools free" />
+        </Row>
       </Card>
 
       <Card>
@@ -84,8 +93,15 @@ export default function DashboardScreen() {
         </Row>
         <AppText style={{ color: theme.colors.muted }}>
           {slipReviews.length === 0
-            ? "No reviews in this mock session yet."
-            : `${slipReviews.length} review saved in this mock session.`}
+            ? "No slip reviews saved yet. If one happens, review it without a shame spiral."
+            : `${slipReviews.length} slip review${slipReviews.length === 1 ? "" : "s"} saved on this device.`}
+        </AppText>
+      </Card>
+
+      <Card>
+        <SectionTitle title="Trust stance" detail="Competitor gap we are intentionally closing." />
+        <AppText style={{ color: theme.colors.textSoft }}>
+          No surveillance screenshots. No fake blocker promises. No emergency paywall. Signal monetizes long-term insight, not crisis access.
         </AppText>
       </Card>
     </Screen>

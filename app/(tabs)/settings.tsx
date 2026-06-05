@@ -1,7 +1,7 @@
 import React from "react";
-import { Switch, View } from "react-native";
+import { Alert, Share, Switch, View } from "react-native";
 
-import { AppText, Button, Card, Header, Row, Screen, SectionTitle } from "@/components/ui";
+import { AppText, Button, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
 import { theme } from "@/constants/theme";
 import { useSignal } from "@/context/signal-store";
 
@@ -28,52 +28,130 @@ function SettingRow({
 }
 
 export default function SettingsScreen() {
-  const { resetMockSession, slipReviews } = useSignal();
-  const [reminders, setReminders] = React.useState(true);
-  const [discreet, setDiscreet] = React.useState(true);
-  const [lock, setLock] = React.useState(false);
-  const [exportReady, setExportReady] = React.useState(false);
+  const {
+    settings,
+    updateSettings,
+    entitlement,
+    setLocalEntitlement,
+    exportLocalData,
+    clearLocalData,
+    checkIns,
+    interventions,
+    slipReviews,
+  } = useSignal();
+
+  const handleExport = async () => {
+    await Share.share({
+      title: "Signal local export",
+      message: exportLocalData(),
+    });
+  };
+
+  const handleClear = () => {
+    Alert.alert(
+      "Delete local Signal data?",
+      "This clears check-ins, SOS sessions, slip reviews, settings, and local entitlement preview. This does not affect GitHub or any future store purchase.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: clearLocalData },
+      ],
+    );
+  };
 
   return (
     <Screen>
       <Header
         eyebrow="Privacy"
         title="Private by default."
-        detail="This mock keeps data in the current session. No account, backend, sync, or analytics."
+        detail="Local-first. No account. No screenshots. No accountability partner unless you explicitly choose that later."
       />
 
       <Card>
         <SectionTitle title="Local-first posture" />
         <SettingRow
           title="Discreet interface"
-          detail="Neutral app language and no public-facing shame cues."
-          value={discreet}
-          onChange={setDiscreet}
+          detail="Neutral language and no public-facing shame cues."
+          value={settings.discreetMode}
+          onChange={(discreetMode) => updateSettings({ discreetMode })}
         />
         <SettingRow
           title="Reminder nudges"
-          detail="Mock morning and late-night structure prompts."
-          value={reminders}
-          onChange={setReminders}
+          detail="Gentle prompts for structure without surveillance."
+          value={settings.remindersEnabled}
+          onChange={(remindersEnabled) => updateSettings({ remindersEnabled })}
         />
         <SettingRow
-          title="App lock placeholder"
-          detail="Reserved for Face ID once the app moves past mock state."
-          value={lock}
-          onChange={setLock}
+          title="High-risk reminders"
+          detail="Reserved for local danger-window reminders after more history."
+          value={settings.highRiskReminders}
+          onChange={(highRiskReminders) => updateSettings({ highRiskReminders })}
+        />
+        <SettingRow
+          title="App lock"
+          detail="Pro-ready privacy control. Face ID/biometric enforcement comes before launch."
+          value={settings.appLockEnabled}
+          onChange={(appLockEnabled) => updateSettings({ appLockEnabled })}
+        />
+        <SettingRow
+          title="Analytics consent"
+          detail="Off by default. Personal behavior data should stay local."
+          value={settings.analyticsConsent}
+          onChange={(analyticsConsent) => updateSettings({ analyticsConsent })}
         />
       </Card>
 
       <Card>
-        <SectionTitle title="Session data" detail={`${slipReviews.length} slip review saved in this mock session.`} />
-        <Button label={exportReady ? "Export prepared" : "Mock export logs"} tone="secondary" onPress={() => setExportReady(true)} />
-        <Button label="Reset mock session" tone="ghost" onPress={resetMockSession} />
+        <SectionTitle title="Local data" detail="Export or delete what is stored on this device." />
+        <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontSize: 28, fontWeight: "900" }}>{checkIns.length}</AppText>
+            <AppText style={{ color: theme.colors.textSoft }}>check-ins</AppText>
+          </View>
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontSize: 28, fontWeight: "900" }}>{interventions.length}</AppText>
+            <AppText style={{ color: theme.colors.textSoft }}>protocols</AppText>
+          </View>
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontSize: 28, fontWeight: "900" }}>{slipReviews.length}</AppText>
+            <AppText style={{ color: theme.colors.textSoft }}>reviews</AppText>
+          </View>
+        </Row>
+        <Button label="Export local data" tone="secondary" onPress={handleExport} />
+        <Button label="Delete local data" tone="ghost" onPress={handleClear} />
+      </Card>
+
+      <Card accentColor={theme.colors.gold}>
+        <SectionTitle title="Free forever" detail="Competitors lose trust when panic tools sit behind a paywall." />
+        <Wrap>
+          {["SOS timer", "Basic check-ins", "Slip review", "Privacy controls"].map((item) => (
+            <Chip key={item} label={item} selected />
+          ))}
+        </Wrap>
+      </Card>
+
+      <Card>
+        <SectionTitle title="Signal Pro" detail="$4.99/month · $39.99/year · 7-day trial target." />
+        <AppText style={{ color: theme.colors.textSoft }}>
+          Pro should unlock advanced local pattern intelligence, custom protocols, weekly review, app lock, export, and future encrypted backup. RevenueCat/StoreKit/Google Play Billing will replace this local preview before launch.
+        </AppText>
+        <Row>
+          <Chip label={`Current: ${entitlement.plan.toUpperCase()}`} selected={entitlement.plan === "pro"} />
+          <Chip label={entitlement.source} />
+        </Row>
+        <Row style={{ alignItems: "stretch" }}>
+          <View style={{ flex: 1 }}>
+            <Button label="Preview Free" tone="ghost" onPress={() => setLocalEntitlement("free")} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button label="Preview Pro" tone="primary" onPress={() => setLocalEntitlement("pro")} />
+          </View>
+        </Row>
       </Card>
 
       <Card>
         <SectionTitle title="Product stance" />
         <AppText style={{ color: theme.colors.textSoft }}>
-          Signal treats urges as data. It is designed for awareness, interruption, and redirection, not shame or streak theater.
+          Signal does not promise perfect blocking. It increases awareness, adds a 10-minute interruption, and helps users redirect before the loop becomes automatic.
         </AppText>
       </Card>
     </Screen>

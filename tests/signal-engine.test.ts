@@ -1,0 +1,121 @@
+import type { CheckInAnswer, CheckInEntry, InterventionSession, SlipReview } from "@/types/signal";
+import { buildPatternAggregate, classifyCheckIn } from "@/utils/signal-engine";
+
+function assertEqual<T>(actual: T, expected: T, message?: string) {
+  if (actual !== expected) {
+    throw new Error(message ?? `Expected ${String(expected)}, received ${String(actual)}`);
+  }
+}
+
+function assertOk<T>(value: T, message?: string): asserts value is NonNullable<T> {
+  if (value === undefined || value === null || value === false) {
+    throw new Error(message ?? "Expected value to be present");
+  }
+}
+
+const baseAnswer: CheckInAnswer = {
+  mood: "Clear",
+  intensity: 12,
+  trigger: "Boredom",
+  lonelinessSignal: "unclear",
+  hasScrolled: false,
+  suggestiveContent: false,
+  bargainingThoughts: false,
+};
+
+const greenResult = classifyCheckIn(baseAnswer);
+
+assertEqual(greenResult.state, "green");
+assertEqual(greenResult.riskScore, 12);
+
+const redResult = classifyCheckIn({
+  ...baseAnswer,
+  mood: "Restless",
+  intensity: 74,
+  trigger: "Late-night phone",
+  lonelinessSignal: "mixed",
+  hasScrolled: true,
+  suggestiveContent: true,
+  bargainingThoughts: true,
+});
+
+assertEqual(redResult.state, "red");
+assertEqual(redResult.riskScore, 100);
+
+const checkIn: CheckInEntry = {
+  id: "check-in-test",
+  createdAt: "2026-06-04T23:12:00.000Z",
+  answer: {
+    ...baseAnswer,
+    mood: "Restless",
+    intensity: 54,
+    trigger: "Late-night phone",
+    hasScrolled: true,
+  },
+  result: classifyCheckIn({
+    ...baseAnswer,
+    mood: "Restless",
+    intensity: 54,
+    trigger: "Late-night phone",
+    hasScrolled: true,
+  }),
+};
+
+const intervention: InterventionSession = {
+  id: "intervention-test",
+  createdAt: "2026-06-04T23:20:00.000Z",
+  completedAt: "2026-06-04T23:30:00.000Z",
+  durationSeconds: 600,
+  selectedAction: "Walk outside",
+  emotion: "Restless",
+  trigger: "Late-night phone",
+  intensityBefore: 82,
+  intensityAfter: 38,
+  reflection: "Moved outside and the spike dropped.",
+  completed: true,
+};
+
+const slipReview: SlipReview = {
+  id: "slip-review-test",
+  createdAt: "2026-06-05T00:05:00.000Z",
+  firstWrongTurn: "Stayed in bed with the phone.",
+  trigger: "Alone in bed",
+  rationalization: "I earned it",
+  state: "red",
+  earlierInterruption: "Stand up before scrolling.",
+  next24Hours: "Sleep, train, and keep the phone out of bed.",
+};
+
+const aggregate = buildPatternAggregate({
+  checkIns: [checkIn],
+  interventions: [intervention],
+  slipReviews: [slipReview],
+});
+
+assertEqual(aggregate.totals.checkIns, 1);
+assertEqual(aggregate.totals.interventions, 1);
+assertEqual(aggregate.totals.completedInterventions, 1);
+assertEqual(aggregate.totals.slipReviews, 1);
+
+const lateNight = aggregate.topTriggers.find((profile) => profile.trigger === "Late-night phone");
+assertOk(lateNight);
+assertEqual(lateNight.count, 2);
+assertEqual(lateNight.averageRisk, checkIn.result.riskScore);
+
+const redirect = aggregate.successfulRedirectActions.find((item) => item.action === "Walk outside");
+assertOk(redirect);
+assertEqual(redirect.count, 1);
+assertEqual(redirect.averageDrop, 44);
+
+assertEqual(aggregate.topRationalizations[0]?.script, "I earned it");
+
+const emptyAggregate = buildPatternAggregate({
+  checkIns: [],
+  interventions: [],
+  slipReviews: [],
+});
+
+assertEqual(emptyAggregate.totals.checkIns, 0);
+assertOk(emptyAggregate.insights.length > 0);
+
+console.log("signal-engine tests passed");
