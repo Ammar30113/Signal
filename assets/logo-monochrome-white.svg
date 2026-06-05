@@ -1,0 +1,20 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="ring-mask">
+      <rect width="1024" height="1024" fill="white" />
+      <!-- Vertical break at 12 o'clock -->
+      <line x1="512" y1="512" x2="512" y2="0" stroke="black" stroke-width="40" />
+      <!-- Diagonal break at roughly 45 degrees (1:30 position) -->
+      <line x1="512" y1="512" x2="1024" y2="0" stroke="black" stroke-width="40" />
+    </mask>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#000000" />
+  
+  <!-- Outer Ring with Mask for Breaks -->
+  <circle cx="512" cy="512" r="320" fill="none" stroke="#FFFFFF" stroke-width="70" mask="url(#ring-mask)" />
+  
+  <!-- Inner Dot in lower-right quadrant -->
+  <circle cx="680" cy="680" r="45" fill="#FFFFFF" />
+</svg>
