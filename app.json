@@ -1,6 +1,6 @@
 {
   "expo": {
-    "owner": "ab3011",
+    "owner": "ab3011s-organization",
     "name": "Signal",
     "slug": "signal",
     "scheme": "signal",
@@ -54,7 +54,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "d75fafba-3385-420e-be25-a30a60afda96"
+        "projectId": "146ba146-c7cb-4821-804f-4f70e2daf811"
       }
     }
   }
