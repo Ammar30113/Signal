@@ -1,5 +1,7 @@
+import * as Haptics from "expo-haptics";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import React from "react";
-import { TextInput, View } from "react-native";
+import { AppState, TextInput, View } from "react-native";
 
 import { IntensitySlider } from "@/components/intensity-slider";
 import { AppText, Button, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
@@ -18,42 +20,70 @@ function formatTime(seconds: number) {
 
 export default function SosScreen() {
   const { snapshot, settings, updateSettings, completeIntervention } = useSignal();
-  const [duration, setDuration] = React.useState(settings.protocolDurationSeconds);
-  const [remaining, setRemaining] = React.useState(settings.protocolDurationSeconds);
+  const duration = settings.protocolDurationSeconds;
+  const [remaining, setRemaining] = React.useState(duration);
   const [running, setRunning] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState<EmergencyAction>("Walk outside");
   const [emotion, setEmotion] = React.useState("Restless");
   const [trigger, setTrigger] = React.useState<Trigger>(snapshot.topTrigger);
   const [intensityBefore, setIntensityBefore] = React.useState(snapshot.intensity);
   const [intensityAfter, setIntensityAfter] = React.useState(Math.max(0, snapshot.intensity - 18));
-  const [reflection, setReflection] = React.useState("I changed location and let the spike pass.");
+  const [reflection, setReflection] = React.useState("");
   const [reflectionReady, setReflectionReady] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
+  const endAtRef = React.useRef<number | null>(null);
 
+  // Keep the countdown aligned with the persisted protocol duration while the
+  // timer is idle (covers settings hydration and the 5 / 10-minute chips).
+  React.useEffect(() => {
+    if (running || reflectionReady) return;
+    setRemaining(duration);
+  }, [duration, running, reflectionReady]);
+
+  // Timestamp-based countdown so the timer stays accurate across backgrounding
+  // and screen lock, and self-corrects when the app returns to the foreground.
   React.useEffect(() => {
     if (!running) return undefined;
 
-    const interval = setInterval(() => {
-      setRemaining((current) => {
-        if (current <= 1) {
-          setRunning(false);
-          setReflectionReady(true);
-          return 0;
-        }
+    if (endAtRef.current == null) {
+      endAtRef.current = Date.now() + remaining * 1000;
+    }
+    void activateKeepAwakeAsync("sos");
 
-        return current - 1;
-      });
-    }, 1000);
+    const tick = () => {
+      const target = endAtRef.current ?? Date.now();
+      const left = Math.max(0, Math.round((target - Date.now()) / 1000));
+      setRemaining(left);
+      if (left <= 0) {
+        endAtRef.current = null;
+        setRunning(false);
+        setReflectionReady(true);
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
+      }
+    };
 
-    return () => clearInterval(interval);
+    tick();
+    const interval = setInterval(tick, 500);
+    const appStateSub = AppState.addEventListener("change", (next) => {
+      if (next === "active") tick();
+    });
+
+    return () => {
+      clearInterval(interval);
+      appStateSub.remove();
+      void deactivateKeepAwake("sos");
+      endAtRef.current = null;
+    };
+    // `remaining` is intentionally read once when the timer starts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running]);
 
   const setProtocolDuration = (seconds: number) => {
-    setDuration(seconds);
-    setRemaining(seconds);
     setRunning(false);
+    setRemaining(seconds);
     setReflectionReady(false);
     setSaved(false);
+    endAtRef.current = null;
     updateSettings({ protocolDurationSeconds: seconds });
   };
 
@@ -106,6 +136,7 @@ export default function SosScreen() {
               tone="danger"
               onPress={() => {
                 if (remaining === 0) {
+                  endAtRef.current = null;
                   setRemaining(duration);
                   setReflectionReady(false);
                   setSaved(false);
@@ -216,7 +247,7 @@ export default function SosScreen() {
           onPress={handleSave}
         />
         <AppText style={{ color: theme.colors.muted }}>
-          SOS, the timer, check-ins, and slip review stay free. Signal never monetizes panic.
+          SOS, the timer, check-ins, and slip review are always available, and everything stays on this device.
         </AppText>
       </Card>
     </Screen>

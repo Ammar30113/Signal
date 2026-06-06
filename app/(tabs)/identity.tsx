@@ -1,17 +1,12 @@
 import React from "react";
 import { View } from "react-native";
 
-import { AppText, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
+import { AppText, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
 import { theme } from "@/constants/theme";
 import { identitySections } from "@/data/signal-data";
 import { useSignal } from "@/context/signal-store";
 
-const goalAreas = [
-  { label: "Body", value: 72 },
-  { label: "Work", value: 64 },
-  { label: "Lifestyle", value: 58 },
-  { label: "Relationships", value: 49 },
-];
+const protectedAreas = ["Body", "Work", "Lifestyle", "Relationships"];
 
 export default function IdentityScreen() {
   const { snapshot } = useSignal();
@@ -32,16 +27,12 @@ export default function IdentityScreen() {
       ))}
 
       <Card>
-        <SectionTitle title="Protected momentum" detail="A grounded view of what stays intact when the sequence is interrupted." />
-        {goalAreas.map((goal) => (
-          <View key={goal.label} style={{ gap: 8 }}>
-            <Row style={{ justifyContent: "space-between" }}>
-              <AppText style={{ fontWeight: "800" }}>{goal.label}</AppText>
-              <AppText style={{ color: theme.colors.muted, fontVariant: ["tabular-nums"] }}>{goal.value}%</AppText>
-            </Row>
-            <ProgressBar value={goal.value} color={theme.colors.green} />
-          </View>
-        ))}
+        <SectionTitle title="What this protects" detail="What stays intact when the sequence is interrupted." />
+        <Wrap>
+          {protectedAreas.map((area) => (
+            <Chip key={area} label={area} />
+          ))}
+        </Wrap>
       </Card>
 
       <Card>

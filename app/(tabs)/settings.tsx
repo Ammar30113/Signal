@@ -1,8 +1,9 @@
 import React from "react";
-import { Alert, Share, Switch, View } from "react-native";
+import { Alert, Linking, Share, Switch, View } from "react-native";
 
 import { AppText, Button, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
 import { theme } from "@/constants/theme";
+import { PRIVACY_POLICY_URL, SUPPORT_EMAIL } from "@/constants/links";
 import { useSignal } from "@/context/signal-store";
 
 function SettingRow({
@@ -31,8 +32,6 @@ export default function SettingsScreen() {
   const {
     settings,
     updateSettings,
-    entitlement,
-    setLocalEntitlement,
     exportLocalData,
     clearLocalData,
     checkIns,
@@ -50,12 +49,20 @@ export default function SettingsScreen() {
   const handleClear = () => {
     Alert.alert(
       "Delete local Signal data?",
-      "This clears check-ins, SOS sessions, slip reviews, settings, and local entitlement preview. This does not affect GitHub or any future store purchase.",
+      "This clears check-ins, SOS sessions, slip reviews, and settings stored on this device. It cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
         { text: "Delete", style: "destructive", onPress: clearLocalData },
       ],
     );
+  };
+
+  const handlePrivacyPolicy = () => {
+    void Linking.openURL(PRIVACY_POLICY_URL).catch(() => undefined);
+  };
+
+  const handleSupport = () => {
+    void Linking.openURL(`mailto:${SUPPORT_EMAIL}`).catch(() => undefined);
   };
 
   return (
@@ -67,37 +74,16 @@ export default function SettingsScreen() {
       />
 
       <Card>
-        <SectionTitle title="Local-first posture" />
-        <SettingRow
-          title="Discreet interface"
-          detail="Neutral language and no public-facing shame cues."
-          value={settings.discreetMode}
-          onChange={(discreetMode) => updateSettings({ discreetMode })}
-        />
-        <SettingRow
-          title="Reminder nudges"
-          detail="Gentle prompts for structure without surveillance."
-          value={settings.remindersEnabled}
-          onChange={(remindersEnabled) => updateSettings({ remindersEnabled })}
-        />
-        <SettingRow
-          title="High-risk reminders"
-          detail="Reserved for local danger-window reminders after more history."
-          value={settings.highRiskReminders}
-          onChange={(highRiskReminders) => updateSettings({ highRiskReminders })}
-        />
+        <SectionTitle title="Privacy posture" />
         <SettingRow
           title="App lock"
-          detail="Pro-ready privacy control. Face ID/biometric enforcement comes before launch."
+          detail="Require Face ID, Touch ID, or your device passcode to open Signal."
           value={settings.appLockEnabled}
           onChange={(appLockEnabled) => updateSettings({ appLockEnabled })}
         />
-        <SettingRow
-          title="Analytics consent"
-          detail="Off by default. Personal behavior data should stay local."
-          value={settings.analyticsConsent}
-          onChange={(analyticsConsent) => updateSettings({ analyticsConsent })}
-        />
+        <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>
+          Signal has no analytics, no trackers, and no accounts. Your data never leaves this device unless you export it yourself.
+        </AppText>
       </Card>
 
       <Card>
@@ -120,38 +106,25 @@ export default function SettingsScreen() {
         <Button label="Delete local data" tone="ghost" onPress={handleClear} />
       </Card>
 
+      <Card>
+        <SectionTitle title="Legal & support" detail="Read how Signal handles data, or get in touch." />
+        <Button label="Privacy policy" tone="secondary" onPress={handlePrivacyPolicy} />
+        <Button label="Contact support" tone="ghost" onPress={handleSupport} />
+      </Card>
+
       <Card accentColor={theme.colors.gold}>
-        <SectionTitle title="Free forever" detail="Competitors lose trust when panic tools sit behind a paywall." />
+        <SectionTitle title="What's included" detail="Everything in Signal is free. Panic tools never sit behind a paywall." />
         <Wrap>
-          {["SOS timer", "Basic check-ins", "Slip review", "Privacy controls"].map((item) => (
+          {["SOS timer", "Check-ins", "Slip review", "Pattern map", "App lock", "Privacy controls"].map((item) => (
             <Chip key={item} label={item} selected />
           ))}
         </Wrap>
       </Card>
 
       <Card>
-        <SectionTitle title="Signal Pro" detail="$4.99/month · $39.99/year · 7-day trial target." />
-        <AppText style={{ color: theme.colors.textSoft }}>
-          Pro should unlock advanced local pattern intelligence, custom protocols, weekly review, app lock, export, and future encrypted backup. RevenueCat/StoreKit/Google Play Billing will replace this local preview before launch.
-        </AppText>
-        <Row>
-          <Chip label={`Current: ${entitlement.plan.toUpperCase()}`} selected={entitlement.plan === "pro"} />
-          <Chip label={entitlement.source} />
-        </Row>
-        <Row style={{ alignItems: "stretch" }}>
-          <View style={{ flex: 1 }}>
-            <Button label="Preview Free" tone="ghost" onPress={() => setLocalEntitlement("free")} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Button label="Preview Pro" tone="primary" onPress={() => setLocalEntitlement("pro")} />
-          </View>
-        </Row>
-      </Card>
-
-      <Card>
         <SectionTitle title="Product stance" />
         <AppText style={{ color: theme.colors.textSoft }}>
-          Signal does not promise perfect blocking. It increases awareness, adds a 10-minute interruption, and helps users redirect before the loop becomes automatic.
+          Signal does not promise perfect blocking. It increases awareness, adds a 10-minute interruption, and helps you redirect before the loop becomes automatic.
         </AppText>
       </Card>
     </Screen>

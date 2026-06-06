@@ -1,4 +1,4 @@
-import { initialSnapshot, patternInsights } from "@/data/signal-data";
+import { initialSnapshot } from "@/data/signal-data";
 import type {
   CheckInAnswer,
   CheckInEntry,
@@ -185,7 +185,7 @@ export function buildPatternAggregate({
   ];
 
   return {
-    insights: insights.length > 0 ? insights : patternInsights,
+    insights,
     topTriggers,
     emotionTriggerPairs,
     topRationalizations,
@@ -214,12 +214,21 @@ export function deriveSnapshot({
 }): SignalSnapshot {
   const lastCheckIn = checkIns[0];
   const lastIntervention = interventions[0];
+  const lastSlip = slipReviews[0];
   const aggregate = buildPatternAggregate({ checkIns, interventions, slipReviews });
   const structuredDays = new Set(
     [...checkIns, ...interventions, ...slipReviews].map((entry) => entry.createdAt.slice(0, 10)),
   ).size;
 
-  if (lastIntervention?.completed && (!lastCheckIn || lastIntervention.createdAt > lastCheckIn.createdAt)) {
+  // Drive the live snapshot from whichever event happened most recently.
+  const events = [
+    lastIntervention?.completed ? { kind: "intervention" as const, at: lastIntervention.createdAt } : null,
+    lastCheckIn ? { kind: "checkin" as const, at: lastCheckIn.createdAt } : null,
+    lastSlip ? { kind: "slip" as const, at: lastSlip.createdAt } : null,
+  ].filter((event): event is NonNullable<typeof event> => event !== null);
+  const latest = events.sort((a, b) => (a.at < b.at ? 1 : -1))[0];
+
+  if (latest?.kind === "intervention" && lastIntervention) {
     const after = lastIntervention.intensityAfter ?? Math.max(0, lastIntervention.intensityBefore - 12);
     const riskScore = Math.min(100, Math.round(after * 1.12));
 
@@ -228,14 +237,27 @@ export function deriveSnapshot({
       currentState: getStateFromScore(riskScore),
       intensity: after,
       riskScore,
-      trend: "falling",
+      trend: getTrend(lastIntervention.intensityBefore, after),
       topTrigger: lastIntervention.trigger,
       progressDays: structuredDays,
       lastCheckInSummary: "10-minute protocol completed. The signal was interrupted before it became automatic.",
     };
   }
 
-  if (lastCheckIn) {
+  if (latest?.kind === "slip" && lastSlip) {
+    return {
+      ...current,
+      currentState: "yellow",
+      intensity: 28,
+      riskScore: 34,
+      trend: "falling",
+      topTrigger: lastSlip.trigger,
+      progressDays: structuredDays,
+      lastCheckInSummary: "Slip reviewed. No binge logic. Protect the next 24 hours.",
+    };
+  }
+
+  if (latest?.kind === "checkin" && lastCheckIn) {
     return {
       ...current,
       currentState: lastCheckIn.result.state,

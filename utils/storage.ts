@@ -22,11 +22,7 @@ export interface SignalPersistedState {
 }
 
 export const defaultSettings: UserSettings = {
-  remindersEnabled: true,
-  highRiskReminders: true,
-  discreetMode: true,
   appLockEnabled: false,
-  analyticsConsent: false,
   protocolDurationSeconds: 600,
 };
 

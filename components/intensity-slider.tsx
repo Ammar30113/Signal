@@ -4,13 +4,7 @@ import { View } from "react-native";
 
 import { stateTheme, theme } from "@/constants/theme";
 import { AppText, Row } from "@/components/ui";
-import type { UrgeState } from "@/types/signal";
-
-function getState(value: number): UrgeState {
-  if (value >= 70) return "red";
-  if (value >= 35) return "yellow";
-  return "green";
-}
+import { getStateFromScore } from "@/utils/signal-engine";
 
 export function IntensitySlider({
   value,
@@ -21,7 +15,15 @@ export function IntensitySlider({
   onChange: (value: number) => void;
   label?: string;
 }) {
-  const state = getState(value);
+  // Track the drag locally so the UI stays smooth; only commit to the
+  // store (and persistence) once, on release, to avoid a write-storm.
+  const [live, setLive] = React.useState(value);
+
+  React.useEffect(() => {
+    setLive(value);
+  }, [value]);
+
+  const state = getStateFromScore(live);
   const accent = stateTheme[state].accent;
 
   return (
@@ -47,19 +49,21 @@ export function IntensitySlider({
             fontVariant: ["tabular-nums"],
           }}
         >
-          {Math.round(value)}
+          {Math.round(live)}
           <AppText style={{ color: theme.colors.muted, fontSize: 16 }}>/100</AppText>
         </AppText>
       </Row>
       <Slider
-        value={value}
+        value={live}
         minimumValue={0}
         maximumValue={100}
         step={1}
         minimumTrackTintColor={accent}
         maximumTrackTintColor={theme.colors.surfaceMuted}
         thumbTintColor={theme.colors.white}
-        onValueChange={onChange}
+        onValueChange={setLive}
+        onSlidingComplete={(next) => onChange(Math.round(next))}
+        accessibilityLabel={`${label}: ${Math.round(live)} out of 100`}
       />
       <Row style={{ justifyContent: "space-between" }}>
         <AppText style={{ color: theme.colors.muted, fontSize: 12, fontWeight: "700" }}>CALM</AppText>

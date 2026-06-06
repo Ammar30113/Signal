@@ -129,7 +129,7 @@ export default function CheckInScreen() {
           <Button
             label={result.state === "red" ? "Open SOS" : "Return to dashboard"}
             tone={result.state === "red" ? "danger" : "secondary"}
-            onPress={() => router.push(result.state === "red" ? "/sos" : "/")}
+            onPress={() => router.navigate(result.state === "red" ? "/sos" : "/")}
           />
         </Card>
       ) : null}

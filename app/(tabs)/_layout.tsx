@@ -14,6 +14,8 @@ function TabMark({
 }) {
   return (
     <View
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
       style={{
         width: 28,
         height: 28,

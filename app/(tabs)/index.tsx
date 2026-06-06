@@ -26,8 +26,9 @@ function getDateLabel() {
 }
 
 export default function DashboardScreen() {
-  const { snapshot, redirects, updateIntensity, slipReviews, checkIns, patternAggregate, entitlement } = useSignal();
+  const { snapshot, redirects, updateIntensity, slipReviews, checkIns, interventions, patternAggregate } = useSignal();
   const current = stateTheme[snapshot.currentState];
+  const hasHistory = checkIns.length + interventions.length + slipReviews.length > 0;
 
   return (
     <Screen>
@@ -35,8 +36,8 @@ export default function DashboardScreen() {
 
       <StateCard
         state={snapshot.currentState}
-        onEmergency={() => router.push("/sos")}
-        onCheckIn={() => router.push("/check-in")}
+        onEmergency={() => router.navigate("/sos")}
+        onCheckIn={() => router.navigate("/check-in")}
       />
 
       <Card>
@@ -54,16 +55,22 @@ export default function DashboardScreen() {
         <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
           <Metric label="Check-ins" value={`${checkIns.length}`} detail="saved locally" />
           <Metric label="SOS done" value={`${patternAggregate.totals.completedInterventions}`} detail="completed" accentColor={theme.colors.green} />
-          <Metric label="Plan" value={entitlement.plan.toUpperCase()} detail="panic tools free" />
+          <Metric label="Reviews" value={`${slipReviews.length}`} detail="saved locally" />
         </Row>
       </Card>
 
       <Card>
         <SectionTitle title="Current trigger" detail="The useful question is where the sequence started." />
-        <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
-          <AppText style={{ fontSize: 22, fontWeight: "800", flex: 1 }}>{snapshot.topTrigger}</AppText>
-          <Chip label={current.label} selected />
-        </Row>
+        {hasHistory ? (
+          <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
+            <AppText style={{ fontSize: 22, fontWeight: "800", flex: 1 }}>{snapshot.topTrigger}</AppText>
+            <Chip label={current.label} selected />
+          </Row>
+        ) : (
+          <AppText style={{ color: theme.colors.textSoft }}>
+            No signals logged yet. Run your first check-in to surface your top trigger.
+          </AppText>
+        )}
       </Card>
 
       <View style={{ gap: 12 }}>
@@ -88,7 +95,7 @@ export default function DashboardScreen() {
             <Button label="Slip review" tone="ghost" onPress={() => router.push("/slip-review")} />
           </View>
           <View style={{ flex: 1 }}>
-            <Button label="Open SOS" tone="danger" onPress={() => router.push("/sos")} />
+            <Button label="Open SOS" tone="danger" onPress={() => router.navigate("/sos")} />
           </View>
         </Row>
         <AppText style={{ color: theme.colors.muted }}>
@@ -101,7 +108,7 @@ export default function DashboardScreen() {
       <Card>
         <SectionTitle title="Trust stance" detail="Competitor gap we are intentionally closing." />
         <AppText style={{ color: theme.colors.textSoft }}>
-          No surveillance screenshots. No fake blocker promises. No emergency paywall. Signal monetizes long-term insight, not crisis access.
+          No surveillance screenshots. No fake blocker promises. No accounts. Everything you log stays on this device.
         </AppText>
       </Card>
     </Screen>

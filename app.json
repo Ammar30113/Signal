@@ -4,17 +4,23 @@
     "slug": "signal",
     "scheme": "signal",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.ammar.signal",
+      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
+      "package": "com.ammar.signal",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#08090D",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -28,7 +34,21 @@
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "backgroundColor": "#08090D",
+          "imageWidth": 200
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Signal uses Face ID to keep your check-ins and history private on this device."
+        }
+      ]
     ]
   }
 }

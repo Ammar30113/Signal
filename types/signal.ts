@@ -158,11 +158,7 @@ export interface PatternAggregate {
 }
 
 export interface UserSettings {
-  remindersEnabled: boolean;
-  highRiskReminders: boolean;
-  discreetMode: boolean;
   appLockEnabled: boolean;
-  analyticsConsent: boolean;
   protocolDurationSeconds: number;
 }
 

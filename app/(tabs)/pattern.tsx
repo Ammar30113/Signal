@@ -11,9 +11,8 @@ function labelForKind(kind: string) {
 }
 
 export default function PatternScreen() {
-  const { patternAggregate, entitlement } = useSignal();
-  const isPro = entitlement.plan === "pro";
-  const visibleInsights = isPro ? patternAggregate.insights : patternAggregate.insights.slice(0, 3);
+  const { patternAggregate } = useSignal();
+  const insights = patternAggregate.insights;
 
   return (
     <Screen>
@@ -44,21 +43,27 @@ export default function PatternScreen() {
       <Card>
         <SectionTitle
           title="Highest-signal insights"
-          detail={isPro ? "Advanced local pattern intelligence is unlocked." : "Basic pattern summary is free. Pro expands depth and history."}
+          detail="Built from your check-ins, SOS sessions, and slip reviews on this device."
         />
-        {visibleInsights.map((insight) => (
-          <View key={insight.id} style={{ gap: 8 }}>
-            <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
-              <View style={{ flex: 1, gap: 3 }}>
-                <Chip label={labelForKind(insight.kind)} />
-                <AppText style={{ fontSize: 18, fontWeight: "800" }}>{insight.title}</AppText>
-                <AppText style={{ color: theme.colors.textSoft }}>{insight.detail}</AppText>
-              </View>
-              <AppText style={{ color: theme.colors.gold, fontSize: 18, fontWeight: "900" }}>{insight.weight}</AppText>
-            </Row>
-            <ProgressBar value={insight.weight} color={theme.colors.gold} />
-          </View>
-        ))}
+        {insights.length === 0 ? (
+          <AppText style={{ color: theme.colors.textSoft }}>
+            Log a check-in or run SOS to surface your highest-signal patterns.
+          </AppText>
+        ) : (
+          insights.map((insight) => (
+            <View key={insight.id} style={{ gap: 8 }}>
+              <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+                <View style={{ flex: 1, gap: 3 }}>
+                  <Chip label={labelForKind(insight.kind)} />
+                  <AppText style={{ fontSize: 18, fontWeight: "800" }}>{insight.title}</AppText>
+                  <AppText style={{ color: theme.colors.textSoft }}>{insight.detail}</AppText>
+                </View>
+                <AppText style={{ color: theme.colors.gold, fontSize: 18, fontWeight: "900" }}>{insight.weight}</AppText>
+              </Row>
+              <ProgressBar value={insight.weight} color={theme.colors.gold} />
+            </View>
+          ))
+        )}
       </Card>
 
       <Card>
@@ -95,7 +100,7 @@ export default function PatternScreen() {
       </Card>
 
       <Card>
-        <SectionTitle title="Redirects that worked" detail="Pro should monetize insight, not panic access." />
+        <SectionTitle title="Redirects that worked" detail="The interruptions that actually lowered your intensity." />
         {patternAggregate.successfulRedirectActions.length === 0 ? (
           <AppText style={{ color: theme.colors.textSoft }}>Complete a protocol reflection to identify your best redirect actions.</AppText>
         ) : (
@@ -142,14 +147,6 @@ export default function PatternScreen() {
         </Wrap>
       </Card>
 
-      {!isPro ? (
-        <Card accentColor={theme.colors.gold}>
-          <SectionTitle title="Signal Pro" detail="$4.99/month or $39.99/year after a 7-day trial." />
-          <AppText style={{ color: theme.colors.textSoft }}>
-            Pro should unlock deeper pattern intelligence, custom protocols, reminders, export, and app lock. SOS remains free forever.
-          </AppText>
-        </Card>
-      ) : null}
     </Screen>
   );
 }

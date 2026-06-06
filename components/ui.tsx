@@ -10,6 +10,7 @@ import {
   type TextStyle,
   type ViewStyle,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { theme } from "@/constants/theme";
 
@@ -24,12 +25,14 @@ export function AppText({ style, ...props }: TextProps) {
 }
 
 export function Screen({ children }: { children: React.ReactNode }) {
+  const insets = useSafeAreaInsets();
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       contentContainerStyle={{
         paddingHorizontal: theme.spacing.screen,
-        paddingTop: 18,
+        paddingTop: insets.top + 18,
         paddingBottom: 118,
         gap: 18,
       }}
@@ -172,6 +175,9 @@ export function Button({
     <Pressable
       onPress={onPress}
       disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: !!disabled }}
       style={({ pressed }) => [
         {
           minHeight: 54,
@@ -244,6 +250,9 @@ export function Chip({
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: !!selected }}
       style={({ pressed }) => [
         {
           alignSelf: "flex-start",

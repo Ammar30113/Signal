@@ -50,7 +50,7 @@ interface SignalContextValue {
 const SignalContext = React.createContext<SignalContextValue | null>(null);
 
 function notifySelection() {
-  if (process.env.EXPO_OS !== "ios") return;
+  if (process.env.EXPO_OS === "web") return;
   void Haptics.selectionAsync().catch(() => undefined);
 }
 
@@ -178,15 +178,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     setSlipReviews((current) => [saved, ...current]);
     setSnapshot((current) =>
       deriveSnapshot({
-        current: {
-          ...current,
-          currentState: "yellow",
-          intensity: 28,
-          riskScore: 34,
-          trend: "falling",
-          topTrigger: review.trigger,
-          lastCheckInSummary: "Slip reviewed. No binge logic. Protect the next 24 hours.",
-        },
+        current,
         checkIns,
         interventions,
         slipReviews: [saved, ...slipReviews],

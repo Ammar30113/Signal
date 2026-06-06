@@ -60,12 +60,12 @@ function Field({
 
 export default function SlipReviewScreen() {
   const { saveSlipReview } = useSignal();
-  const [firstWrongTurn, setFirstWrongTurn] = React.useState("Stayed in bed with the phone.");
+  const [firstWrongTurn, setFirstWrongTurn] = React.useState("");
   const [trigger, setTrigger] = React.useState<Trigger>("Alone in bed");
   const [rationalization, setRationalization] = React.useState<RationalizationScript>("One peek will not hurt");
   const [state, setState] = React.useState<UrgeState>("yellow");
-  const [earlierInterruption, setEarlierInterruption] = React.useState("Put the phone across the room before scrolling.");
-  const [next24Hours, setNext24Hours] = React.useState("Sleep early, train in the morning, no phone in bed.");
+  const [earlierInterruption, setEarlierInterruption] = React.useState("");
+  const [next24Hours, setNext24Hours] = React.useState("");
   const [saved, setSaved] = React.useState(false);
 
   const canSave = firstWrongTurn.trim().length > 0 && earlierInterruption.trim().length > 0 && next24Hours.trim().length > 0;
@@ -162,7 +162,7 @@ export default function SlipReviewScreen() {
               <AppText style={{ color: theme.colors.textSoft }}>{item}</AppText>
             </Row>
           ))}
-          <Button label="Back to dashboard" tone="secondary" onPress={() => router.push("/")} />
+          <Button label="Back to dashboard" tone="secondary" onPress={() => router.back()} />
         </Card>
       ) : null}
     </Screen>

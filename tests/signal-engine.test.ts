@@ -1,5 +1,6 @@
+import { initialSnapshot } from "@/data/signal-data";
 import type { CheckInAnswer, CheckInEntry, InterventionSession, SlipReview } from "@/types/signal";
-import { buildPatternAggregate, classifyCheckIn } from "@/utils/signal-engine";
+import { buildPatternAggregate, classifyCheckIn, deriveSnapshot } from "@/utils/signal-engine";
 
 function assertEqual<T>(actual: T, expected: T, message?: string) {
   if (actual !== expected) {
@@ -116,6 +117,30 @@ const emptyAggregate = buildPatternAggregate({
 });
 
 assertEqual(emptyAggregate.totals.checkIns, 0);
-assertOk(emptyAggregate.insights.length > 0);
+// With no data, insights must be empty rather than fabricated seed data.
+assertEqual(emptyAggregate.insights.length, 0);
+
+// A slip review must drive the snapshot when it is the most recent event,
+// even if a check-in and an intervention already exist.
+const slipDriven = deriveSnapshot({
+  current: initialSnapshot,
+  checkIns: [checkIn],
+  interventions: [intervention],
+  slipReviews: [{ ...slipReview, createdAt: "2026-06-05T02:00:00.000Z" }],
+});
+
+assertEqual(slipDriven.currentState, "yellow");
+assertEqual(slipDriven.topTrigger, "Alone in bed");
+assertEqual(slipDriven.trend, "falling");
+
+// An intervention that is the most recent event reports a real (non-hardcoded) trend.
+const interventionDriven = deriveSnapshot({
+  current: initialSnapshot,
+  checkIns: [],
+  interventions: [intervention],
+  slipReviews: [],
+});
+
+assertEqual(interventionDriven.trend, "falling");
 
 console.log("signal-engine tests passed");

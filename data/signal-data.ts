@@ -64,13 +64,13 @@ export const redirectActions: RedirectAction[] = [
 ];
 
 export const initialSnapshot: SignalSnapshot = {
-  currentState: "yellow",
-  intensity: 34,
-  riskScore: 42,
-  trend: "rising",
+  currentState: "green",
+  intensity: 0,
+  riskScore: 0,
+  trend: "stable",
   topTrigger: "Purposeless scrolling",
-  progressDays: 8,
-  lastCheckInSummary: "Drift detected. Interrupt early. Do not negotiate.",
+  progressDays: 0,
+  lastCheckInSummary: "Run your first check-in to calibrate your signal.",
 };
 
 export const patternInsights: PatternInsight[] = [
