@@ -1,5 +1,6 @@
 {
   "expo": {
+    "owner": "ab3011",
     "name": "Signal",
     "slug": "signal",
     "scheme": "signal",
@@ -12,14 +13,14 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.ammar.signal",
+      "bundleIdentifier": "com.signal.reset",
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.ammar.signal",
+      "package": "com.signal.reset",
       "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#08090D",
@@ -49,6 +50,12 @@
           "faceIDPermission": "Signal uses Face ID to keep your check-ins and history private on this device."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d75fafba-3385-420e-be25-a30a60afda96"
+      }
+    }
   }
 }
