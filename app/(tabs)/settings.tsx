@@ -1,10 +1,12 @@
 import Constants from "expo-constants";
+import { router } from "expo-router";
 import React from "react";
 import { Alert, Linking, Share, Switch, View } from "react-native";
 
 import { AppText, Button, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
-import { theme } from "@/constants/theme";
 import { PRIVACY_POLICY_URL, SUPPORT_EMAIL, TERMS_OF_SERVICE_URL } from "@/constants/links";
+import { isProBillingEnabled } from "@/constants/revenuecat";
+import { theme } from "@/constants/theme";
 import { useSignal } from "@/context/signal-store";
 
 function SettingRow({
@@ -24,7 +26,13 @@ function SettingRow({
         <AppText style={{ fontSize: 16, fontWeight: "800" }}>{title}</AppText>
         <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>{detail}</AppText>
       </View>
-      <Switch value={value} onValueChange={onChange} trackColor={{ false: theme.colors.surfaceMuted, true: theme.colors.gold }} />
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        accessibilityLabel={title}
+        accessibilityHint={detail}
+        trackColor={{ false: theme.colors.surfaceMuted, true: theme.colors.gold }}
+      />
     </Row>
   );
 }
@@ -33,6 +41,7 @@ export default function SettingsScreen() {
   const {
     settings,
     updateSettings,
+    entitlement,
     exportLocalData,
     clearLocalData,
     checkIns,
@@ -41,10 +50,18 @@ export default function SettingsScreen() {
   } = useSignal();
 
   const handleExport = async () => {
-    await Share.share({
-      title: "Signal local export",
-      message: exportLocalData(),
-    });
+    if (checkIns.length + interventions.length + slipReviews.length === 0) {
+      Alert.alert("Nothing to export yet", "Log a check-in, SOS session, or slip review first.");
+      return;
+    }
+    try {
+      await Share.share({
+        title: "Signal local export",
+        message: exportLocalData(),
+      });
+    } catch {
+      Alert.alert("Export failed", "Could not open the share sheet. Please try again.");
+    }
   };
 
   const handleClear = () => {
@@ -121,6 +138,20 @@ export default function SettingsScreen() {
         <Button label="Contact support" tone="ghost" onPress={handleSupport} />
       </Card>
 
+      {isProBillingEnabled() ? (
+        <Card accentColor={theme.colors.gold}>
+          <SectionTitle
+            title="Signal Pro"
+            detail={entitlement.plan === "pro" ? "Pro is active. Thank you for supporting Signal." : "Deeper insight, custom protocols, and reminders."}
+          />
+          <Button
+            label={entitlement.plan === "pro" ? "Manage Signal Pro" : "View Signal Pro"}
+            tone="primary"
+            onPress={() => router.navigate("/paywall")}
+          />
+        </Card>
+      ) : null}
+
       <Card accentColor={theme.colors.gold}>
         <SectionTitle title="What's included" detail="Everything in Signal is free. Panic tools never sit behind a paywall." />
         <Wrap>
@@ -134,6 +165,9 @@ export default function SettingsScreen() {
         <SectionTitle title="Product stance" />
         <AppText style={{ color: theme.colors.textSoft }}>
           Signal does not promise perfect blocking. It increases awareness, adds a 10-minute interruption, and helps you redirect before the loop becomes automatic.
+        </AppText>
+        <AppText style={{ color: theme.colors.muted, fontSize: 13 }}>
+          Signal is a self-help tool, not a substitute for professional medical or mental health care. If you are in crisis, contact a licensed professional or local emergency services.
         </AppText>
       </Card>
 

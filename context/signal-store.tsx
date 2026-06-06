@@ -15,6 +15,8 @@ import type {
   UserSettings,
 } from "@/types/signal";
 import { buildPatternAggregate, classifyCheckIn, deriveSnapshot, getStateFromScore, getTrend } from "@/utils/signal-engine";
+import { isProBillingEnabled } from "@/constants/revenuecat";
+import { addPlanListener, getCurrentPlan } from "@/utils/purchases";
 import {
   clearSignalState,
   createSignalExport,
@@ -42,6 +44,7 @@ interface SignalContextValue {
   saveSlipReview: (review: Omit<SlipReview, "id" | "createdAt">) => SlipReview;
   updateSettings: (patch: Partial<UserSettings>) => void;
   setLocalEntitlement: (plan: Entitlement["plan"]) => void;
+  refreshEntitlement: () => Promise<void>;
   exportLocalData: () => string;
   clearLocalData: () => void;
   resetMockSession: () => void;
@@ -90,6 +93,43 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       entitlement,
     });
   }, [checkIns, entitlement, interventions, isHydrated, settings, slipReviews, snapshot]);
+
+  // Sync entitlement from RevenueCat — only when billing is configured.
+  // With no API key this never runs, so the free build stays purely local.
+  React.useEffect(() => {
+    if (!isHydrated || !isProBillingEnabled()) return;
+
+    let active = true;
+    let unsubscribe: (() => void) | undefined;
+
+    void (async () => {
+      try {
+        const plan = await getCurrentPlan();
+        if (!active) return;
+        setEntitlement({ plan, source: "revenuecat", lastCheckedAt: new Date().toISOString() });
+        unsubscribe = await addPlanListener((nextPlan) => {
+          setEntitlement({ plan: nextPlan, source: "revenuecat", lastCheckedAt: new Date().toISOString() });
+        });
+      } catch {
+        // Leave the last known (persisted) entitlement in place on failure.
+      }
+    })();
+
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
+  }, [isHydrated]);
+
+  const refreshEntitlement = React.useCallback(async () => {
+    if (!isProBillingEnabled()) return;
+    try {
+      const plan = await getCurrentPlan();
+      setEntitlement({ plan, source: "revenuecat", lastCheckedAt: new Date().toISOString() });
+    } catch {
+      // Ignore; the customer-info listener will reconcile when possible.
+    }
+  }, []);
 
   const patternAggregate = React.useMemo(
     () => buildPatternAggregate({ checkIns, interventions, slipReviews }),
@@ -244,6 +284,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       saveSlipReview,
       updateSettings,
       setLocalEntitlement,
+      refreshEntitlement,
       exportLocalData,
       clearLocalData,
       resetMockSession: clearLocalData,
@@ -257,6 +298,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       interventions,
       isHydrated,
       patternAggregate,
+      refreshEntitlement,
       saveSlipReview,
       settings,
       setLocalEntitlement,

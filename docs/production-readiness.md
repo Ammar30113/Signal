@@ -35,15 +35,24 @@ Target pricing:
 
 ## Billing Notes
 
-The app now has a local `Entitlement` model and Pro preview UI. Real purchases still require:
+v1 ships fully free. The RevenueCat integration is **built but dormant** — it stays completely inert (and Expo Go keeps working) until a RevenueCat public SDK key is set.
 
-- RevenueCat project
-- App Store Connect subscription products
-- Google Play Billing subscription products
-- RevenueCat public SDK keys
-- TestFlight/internal testing build for real purchase QA
+Already wired:
 
-Expo Go can preview UI, but real in-app purchases require a development or store build.
+- `react-native-purchases@10.2.2` (autolinks on prebuild; no config plugin needed)
+- `utils/purchases.ts` — wrapper with a lazy dynamic import; the native SDK is only loaded when a key is configured
+- `constants/revenuecat.ts` — `REVENUECAT_IOS_API_KEY` / `REVENUECAT_ANDROID_API_KEY` (empty = off), `PRO_ENTITLEMENT_ID = "pro"`, manage-subscription deep link
+- `app/paywall.tsx` — offerings list, purchase, restore, manage-subscription, privacy link
+- Store: `entitlement` is synced from RevenueCat (with a customer-info listener) only when billing is enabled; `refreshEntitlement()` exposed
+- Settings: a Pro entry that appears only when `isProBillingEnabled()` is true
+
+To enable Pro (v1.1):
+
+1. Create the RevenueCat project; add the iOS + Android apps; set the `pro` entitlement and an offering with monthly + annual packages.
+2. Create the App Store Connect + Google Play subscription products and attach them in RevenueCat. (Keep the App Store Connect subscription already created — do not delete it; attach it to the v1.1 submission.)
+3. Paste the public SDK keys into `constants/revenuecat.ts`.
+4. Re-add feature gates on Pro-only screens (the gating on advanced Pattern insights was removed for the free launch).
+5. Build a dev/EAS build (RevenueCat cannot run in Expo Go) and QA purchase, restore, cancel, expired subscription, no-network entitlement, and reinstall.
 
 ---
 
@@ -124,3 +133,9 @@ Expo Go can preview UI, but real in-app purchases require a development or store
 4. **No IAP in v1**: Since v1 is entirely free with no in-app purchases, the billing/subscription review is skipped.
 
 5. **Screenshots**: Take screenshots on a device or simulator with realistic data (not empty states). Show the SOS timer running, a completed check-in, and the pattern map with at least some data.
+
+## Pro Checklist (v1.1 fast-follow)
+
+- Subscription restore + manage actions: DONE (`app/paywall.tsx`).
+- Set RevenueCat keys, re-add Pro feature gates, attach the App Store Connect subscription.
+- Test purchase, restore, cancel, expired subscription, no-network entitlement, and reinstall on a dev/store build.

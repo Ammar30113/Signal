@@ -66,6 +66,13 @@ export default function RootLayout() {
                   presentation: "card",
                 }}
               />
+              <Stack.Screen
+                name="paywall"
+                options={{
+                  title: "Signal Pro",
+                  presentation: "modal",
+                }}
+              />
             </Stack>
           </AppLockGate>
         </SignalProvider>
