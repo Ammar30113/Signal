@@ -58,6 +58,7 @@ export default function RootLayout() {
             >
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+              <Stack.Screen name="about" options={{ title: "Our Story", headerBackTitle: "Back" }} />
               <Stack.Screen
                 name="slip-review"
                 options={{

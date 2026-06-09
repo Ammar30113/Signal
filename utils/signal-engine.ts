@@ -31,13 +31,13 @@ export function classifyCheckIn(answer: CheckInAnswer): CheckInResult {
   let score = answer.intensity;
 
   if (answer.hasScrolled) score += 12;
-  if (answer.suggestiveContent) score += 18;
-  if (answer.bargainingThoughts) score += 22;
-  if (answer.lonelinessSignal === "mostly-lonely") score += 8;
-  if (answer.lonelinessSignal === "mixed") score += 6;
-  if (answer.trigger === "Alone in bed") score += 12;
+  if (answer.exposedToContent) score += 24;
+  if (answer.bargainingThoughts) score += 18;
+  if (answer.emotionalDriver === "emotional-need") score += 8;
+  if (answer.emotionalDriver === "mixed") score += 6;
+  if (answer.trigger === "Alone and unstructured") score += 12;
   if (answer.trigger === "Late-night phone") score += 10;
-  if (answer.trigger === "Milestone reward logic") score += 10;
+  if (answer.trigger === "After a win or milestone") score += 10;
 
   const riskScore = Math.min(100, Math.round(score));
   const state = getStateFromScore(riskScore);

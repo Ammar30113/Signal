@@ -18,9 +18,9 @@ const baseAnswer: CheckInAnswer = {
   mood: "Clear",
   intensity: 12,
   trigger: "Boredom",
-  lonelinessSignal: "unclear",
+  emotionalDriver: "unclear",
   hasScrolled: false,
-  suggestiveContent: false,
+  exposedToContent: false,
   bargainingThoughts: false,
 };
 
@@ -34,9 +34,9 @@ const redResult = classifyCheckIn({
   mood: "Restless",
   intensity: 74,
   trigger: "Late-night phone",
-  lonelinessSignal: "mixed",
+  emotionalDriver: "mixed",
   hasScrolled: true,
-  suggestiveContent: true,
+  exposedToContent: true,
   bargainingThoughts: true,
 });
 
@@ -80,7 +80,7 @@ const slipReview: SlipReview = {
   id: "slip-review-test",
   createdAt: "2026-06-05T00:05:00.000Z",
   firstWrongTurn: "Stayed in bed with the phone.",
-  trigger: "Alone in bed",
+  trigger: "Alone and unstructured",
   rationalization: "I earned it",
   state: "red",
   earlierInterruption: "Stand up before scrolling.",
@@ -130,7 +130,7 @@ const slipDriven = deriveSnapshot({
 });
 
 assertEqual(slipDriven.currentState, "yellow");
-assertEqual(slipDriven.topTrigger, "Alone in bed");
+assertEqual(slipDriven.topTrigger, "Alone and unstructured");
 assertEqual(slipDriven.trend, "falling");
 
 // An intervention that is the most recent event reports a real (non-hardcoded) trend.

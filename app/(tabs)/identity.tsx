@@ -6,7 +6,7 @@ import { theme } from "@/constants/theme";
 import { identitySections } from "@/data/signal-data";
 import { useSignal } from "@/context/signal-store";
 
-const protectedAreas = ["Body", "Work", "Lifestyle", "Relationships"];
+// Remove unused array
 
 export default function IdentityScreen() {
   const { snapshot } = useSignal();
@@ -15,8 +15,8 @@ export default function IdentityScreen() {
     <Screen>
       <Header
         eyebrow="Identity"
-        title="Build toward something."
-        detail="The product is not avoidance. It is direction under pressure."
+        title="Remember who you are."
+        detail="The product is not avoidance. It is building a system that makes the old pattern unnecessary."
       />
 
       {identitySections.map((section) => (
@@ -27,10 +27,10 @@ export default function IdentityScreen() {
       ))}
 
       <Card>
-        <SectionTitle title="What this protects" detail="What stays intact when the sequence is interrupted." />
+        <SectionTitle title="What this protects" detail="The compound interest of showing up." />
         <Wrap>
-          {protectedAreas.map((area) => (
-            <Chip key={area} label={area} />
+          {["Focus", "Energy", "Time", "Relationships", "Self-respect"].map((item) => (
+            <Chip key={item} label={item} selected />
           ))}
         </Wrap>
       </Card>
@@ -48,13 +48,23 @@ export default function IdentityScreen() {
         </Row>
       </Card>
 
-      <Card>
+      <Card accentColor={theme.colors.gold}>
         <SectionTitle title="Operating principles" />
-        <Wrap>
-          {["Signals, not commands", "Interrupt early", "No binge logic", "Real intimacy over novelty"].map((item) => (
-            <Chip key={item} label={item} />
+        <View style={{ gap: 12 }}>
+          {["Systems over willpower", "Interrupt early", "No shame spirals", "Long-term value over short-term relief"].map((item) => (
+            <Row key={item}>
+              <View
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: theme.colors.gold,
+                }}
+              />
+              <AppText style={{ color: theme.colors.text }}>{item}</AppText>
+            </Row>
           ))}
-        </Wrap>
+        </View>
       </Card>
     </Screen>
   );

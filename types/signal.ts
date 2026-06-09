@@ -9,32 +9,33 @@ export type Trigger =
   | "Loneliness"
   | "Late-night phone"
   | "Purposeless scrolling"
-  | "Suggestive content"
-  | "Overwhelmed"
-  | "Morning without purpose"
-  | "Alone in bed"
-  | "Milestone reward logic";
+  | "Stress or overwhelm"
+  | "After a win or milestone"
+  | "Morning without structure"
+  | "Alone and unstructured"
+  | "Social media"
+  | "Emotional numbness";
 
 export type RationalizationScript =
-  | "One peek will not hurt"
+  | "Just this once"
   | "I earned it"
-  | "I will restart tomorrow"
-  | "Soft content does not count"
+  | "I will start fresh tomorrow"
+  | "It is not that serious"
   | "Just for today"
   | "I only need a minute"
-  | "I need to release the heat";
+  | "I deserve a break";
 
-export type LonelinessSignal = "mostly-lonely" | "mostly-horny" | "mixed" | "unclear";
+export type EmotionalDriver = "emotional-need" | "surface-craving" | "mixed" | "unclear";
 
 export type EmergencyAction =
   | "Walk outside"
-  | "Cold shower"
+  | "Cold water on face"
   | "Pushups"
   | "Leave the room"
-  | "Sleep"
-  | "Read"
-  | "Journal"
-  | "Intentional non-porn release";
+  | "Call or text someone"
+  | "Read something"
+  | "Write it down"
+  | "Sleep";
 
 export type PatternInsightKind =
   | "trigger"
@@ -63,11 +64,11 @@ export interface RedirectAction {
 
 export interface CheckInAnswer {
   mood: string;
-  intensity: number;
+  intensity: number; // 0-100
   trigger: Trigger;
-  lonelinessSignal: LonelinessSignal;
+  emotionalDriver: EmotionalDriver;
   hasScrolled: boolean;
-  suggestiveContent: boolean;
+  exposedToContent: boolean;
   bargainingThoughts: boolean;
 }
 

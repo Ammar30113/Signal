@@ -162,7 +162,7 @@ export default function SosScreen() {
       </Card>
 
       <Card>
-        <SectionTitle title="Name the cue" detail="This is the part competitors miss: the urge is usually emotion plus context." />
+        <SectionTitle title="Name the cue" detail="The useful question is what you were feeling and where it started — not what you almost did." />
         <Wrap>
           {moods.map((item) => (
             <Chip key={item} label={item} selected={emotion === item} onPress={() => setEmotion(item)} />

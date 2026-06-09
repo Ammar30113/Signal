@@ -61,8 +61,8 @@ function Field({
 export default function SlipReviewScreen() {
   const { saveSlipReview } = useSignal();
   const [firstWrongTurn, setFirstWrongTurn] = React.useState("");
-  const [trigger, setTrigger] = React.useState<Trigger>("Alone in bed");
-  const [rationalization, setRationalization] = React.useState<RationalizationScript>("One peek will not hurt");
+  const [trigger, setTrigger] = React.useState<Trigger>("Alone and unstructured");
+  const [rationalization, setRationalization] = React.useState<RationalizationScript>("Just this once");
   const [state, setState] = React.useState<UrgeState>("yellow");
   const [earlierInterruption, setEarlierInterruption] = React.useState("");
   const [next24Hours, setNext24Hours] = React.useState("");

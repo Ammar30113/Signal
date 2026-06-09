@@ -32,7 +32,7 @@ export default function DashboardScreen() {
 
   return (
     <Screen>
-      <Header eyebrow={getDateLabel()} title={getGreeting()} detail="Private 10-minute interruption for urges, loops, and drift." />
+      <Header eyebrow={getDateLabel()} title="Signal" detail="Private 10-minute interruption system for urges, cravings, and unwanted habits." />
 
       <StateCard
         state={snapshot.currentState}
@@ -106,9 +106,9 @@ export default function DashboardScreen() {
       </Card>
 
       <Card>
-        <SectionTitle title="Trust stance" detail="Competitor gap we are intentionally closing." />
-        <AppText style={{ color: theme.colors.textSoft }}>
-          No surveillance screenshots. No fake blocker promises. No accounts. Everything you log stays on this device.
+        <SectionTitle title="Trust stance" />
+        <AppText style={{ color: theme.colors.textSoft, lineHeight: 22 }}>
+          No surveillance. No fake promises. No accounts. Everything you log stays on this device. Built from the system in Atomic Habits — identify the cue, interrupt the routine, redirect the reward.
         </AppText>
       </Card>
     </Screen>

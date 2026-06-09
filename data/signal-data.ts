@@ -12,34 +12,35 @@ export const triggers: Trigger[] = [
   "Loneliness",
   "Late-night phone",
   "Purposeless scrolling",
-  "Suggestive content",
-  "Overwhelmed",
-  "Morning without purpose",
-  "Alone in bed",
-  "Milestone reward logic",
+  "Stress or overwhelm",
+  "After a win or milestone",
+  "Morning without structure",
+  "Alone and unstructured",
+  "Social media",
+  "Emotional numbness",
 ];
 
 export const moods = ["Clear", "Restless", "Flat", "Lonely", "Overloaded", "Charged"];
 
 export const rationalizationScripts: RationalizationScript[] = [
-  "One peek will not hurt",
+  "Just this once",
   "I earned it",
-  "I will restart tomorrow",
-  "Soft content does not count",
+  "I will start fresh tomorrow",
+  "It is not that serious",
   "Just for today",
   "I only need a minute",
-  "I need to release the heat",
+  "I deserve a break",
 ];
 
 export const emergencyActions: EmergencyAction[] = [
   "Walk outside",
-  "Cold shower",
+  "Cold water on face",
   "Pushups",
   "Leave the room",
+  "Call or text someone",
+  "Read something",
+  "Write it down",
   "Sleep",
-  "Read",
-  "Journal",
-  "Intentional non-porn release",
 ];
 
 export const redirectActions: RedirectAction[] = [
@@ -119,28 +120,28 @@ export const patternInsights: PatternInsight[] = [
 ];
 
 export const escalationPath = [
-  "Initial stimulation",
-  "Visual curiosity",
-  "Scrolling",
-  "Fantasy increase",
-  "Bargaining",
-  "Hovering",
-  "Total engagement",
-  "Short relief",
-  "Fog and depletion",
+  "Initial trigger",
+  "Curiosity or pull",
+  "Browsing or hovering",
+  "Rationalization begins",
+  "Bargaining with yourself",
+  "Giving in feels inevitable",
+  "The act",
+  "Brief relief",
+  "Fog, regret, or depletion",
 ];
 
 export const identitySections = [
   {
     title: "Why I am doing this",
-    body: "Protect focus, self-respect, and the ability to choose real life when novelty is available.",
+    body: "Protect focus, clarity, and the ability to choose long-term value over short-term impulse.",
   },
   {
     title: "Who I am becoming",
-    body: "A man who notices the signal early, moves cleanly, and does not outsource discipline to mood.",
+    body: "Someone who notices the signal early, interrupts the pattern, and builds systems instead of relying on willpower.",
   },
   {
     title: "What this protects",
-    body: "Body, work, intimacy, confidence, charisma, and momentum that compounds quietly.",
+    body: "Energy, time, relationships, self-respect, and the momentum that compounds when you stay consistent.",
   },
 ];

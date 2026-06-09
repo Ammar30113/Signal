@@ -7,11 +7,11 @@ import { AppText, Button, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } 
 import { stateTheme, theme } from "@/constants/theme";
 import { moods, triggers } from "@/data/signal-data";
 import { useSignal } from "@/context/signal-store";
-import type { CheckInResult, LonelinessSignal, Trigger } from "@/types/signal";
+import type { CheckInResult, EmotionalDriver, Trigger } from "@/types/signal";
 
-const lonelinessOptions: { label: string; value: LonelinessSignal }[] = [
-  { label: "Mostly lonely", value: "mostly-lonely" },
-  { label: "Mostly horny", value: "mostly-horny" },
+const emotionalDriverOptions: { label: string; value: EmotionalDriver }[] = [
+  { label: "Emotional need", value: "emotional-need" },
+  { label: "Surface craving", value: "surface-craving" },
   { label: "Mixed", value: "mixed" },
   { label: "Unclear", value: "unclear" },
 ];
@@ -41,9 +41,9 @@ export default function CheckInScreen() {
   const [mood, setMood] = React.useState("Restless");
   const [intensity, setIntensity] = React.useState(snapshot.intensity);
   const [trigger, setTrigger] = React.useState<Trigger>(snapshot.topTrigger);
-  const [lonelinessSignal, setLonelinessSignal] = React.useState<LonelinessSignal>("mixed");
+  const [emotionalDriver, setEmotionalDriver] = React.useState<EmotionalDriver>("mixed");
   const [hasScrolled, setHasScrolled] = React.useState(true);
-  const [suggestiveContent, setSuggestiveContent] = React.useState(false);
+  const [exposedToContent, setExposedToContent] = React.useState(false);
   const [bargainingThoughts, setBargainingThoughts] = React.useState(false);
   const [result, setResult] = React.useState<CheckInResult | null>(null);
 
@@ -52,9 +52,9 @@ export default function CheckInScreen() {
       mood,
       intensity,
       trigger,
-      lonelinessSignal,
+      emotionalDriver,
       hasScrolled,
-      suggestiveContent,
+      exposedToContent,
       bargainingThoughts,
     });
     setResult(next);
@@ -91,14 +91,14 @@ export default function CheckInScreen() {
       </Card>
 
       <Card>
-        <SectionTitle title="Loneliness vs horniness" detail="This distinction changes the intervention." />
+        <SectionTitle title="What's driving this?" detail="The real need underneath is often different from the surface craving." />
         <Wrap>
-          {lonelinessOptions.map((item) => (
+          {emotionalDriverOptions.map((item) => (
             <Chip
               key={item.value}
               label={item.label}
-              selected={lonelinessSignal === item.value}
-              onPress={() => setLonelinessSignal(item.value)}
+              selected={emotionalDriver === item.value}
+              onPress={() => setEmotionalDriver(item.value)}
             />
           ))}
         </Wrap>
@@ -107,7 +107,7 @@ export default function CheckInScreen() {
       <Card>
         <SectionTitle title="Escalation cues" />
         <BinaryRow label="Have you been scrolling without a clear purpose?" value={hasScrolled} onChange={setHasScrolled} />
-        <BinaryRow label="Was suggestive content involved?" value={suggestiveContent} onChange={setSuggestiveContent} />
+        <BinaryRow label="Have you been exposed to triggering content?" value={exposedToContent} onChange={setExposedToContent} />
         <BinaryRow label="Are bargaining thoughts present?" value={bargainingThoughts} onChange={setBargainingThoughts} />
       </Card>
 
