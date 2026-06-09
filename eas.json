@@ -19,6 +19,12 @@
         "resourceClass": "m-medium"
       }
     },
+    "preview-simulator": {
+      "extends": "preview",
+      "ios": {
+        "simulator": true
+      }
+    },
     "production": {
       "autoIncrement": true,
       "ios": {
