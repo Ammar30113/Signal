@@ -1,9 +1,10 @@
+import Constants from "expo-constants";
 import React from "react";
 import { Alert, Linking, Share, Switch, View } from "react-native";
 
 import { AppText, Button, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
 import { theme } from "@/constants/theme";
-import { PRIVACY_POLICY_URL, SUPPORT_EMAIL } from "@/constants/links";
+import { PRIVACY_POLICY_URL, SUPPORT_EMAIL, TERMS_OF_SERVICE_URL } from "@/constants/links";
 import { useSignal } from "@/context/signal-store";
 
 function SettingRow({
@@ -61,9 +62,16 @@ export default function SettingsScreen() {
     void Linking.openURL(PRIVACY_POLICY_URL).catch(() => undefined);
   };
 
+  const handleTermsOfService = () => {
+    void Linking.openURL(TERMS_OF_SERVICE_URL).catch(() => undefined);
+  };
+
   const handleSupport = () => {
     void Linking.openURL(`mailto:${SUPPORT_EMAIL}`).catch(() => undefined);
   };
+
+  const appVersion = Constants.expoConfig?.version ?? "1.0.0";
+  const buildNumber = Constants.expoConfig?.ios?.buildNumber ?? "1";
 
   return (
     <Screen>
@@ -109,6 +117,7 @@ export default function SettingsScreen() {
       <Card>
         <SectionTitle title="Legal & support" detail="Read how Signal handles data, or get in touch." />
         <Button label="Privacy policy" tone="secondary" onPress={handlePrivacyPolicy} />
+        <Button label="Terms of service" tone="secondary" onPress={handleTermsOfService} />
         <Button label="Contact support" tone="ghost" onPress={handleSupport} />
       </Card>
 
@@ -126,6 +135,17 @@ export default function SettingsScreen() {
         <AppText style={{ color: theme.colors.textSoft }}>
           Signal does not promise perfect blocking. It increases awareness, adds a 10-minute interruption, and helps you redirect before the loop becomes automatic.
         </AppText>
+      </Card>
+
+      <Card>
+        <View style={{ alignItems: "center", gap: 4 }}>
+          <AppText style={{ color: theme.colors.muted, fontSize: 13 }}>
+            Signal v{appVersion} ({buildNumber})
+          </AppText>
+          <AppText style={{ color: theme.colors.mutedDark, fontSize: 12 }}>
+            Local-first. No account. No trackers.
+          </AppText>
+        </View>
       </Card>
     </Screen>
   );

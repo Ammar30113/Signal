@@ -1,9 +1,14 @@
-// Fill these in before submitting to the App Store / Google Play.
+// Production URLs — update these before App Store submission.
 //
 // PRIVACY_POLICY_URL must resolve to a publicly hosted page — Apple and Google
-// both require a working privacy-policy URL. A starting draft you can host lives
-// at docs/privacy-policy.md (e.g. publish it with GitHub Pages).
+// both require a working privacy-policy URL. A production-ready draft lives
+// at docs/privacy-policy.md (host it with GitHub Pages or your own domain).
+//
+// TERMS_OF_SERVICE_URL must also be a publicly accessible page.
+// A production-ready draft lives at docs/terms-of-service.md.
+//
 // SUPPORT_EMAIL must be a monitored address.
 
-export const PRIVACY_POLICY_URL = "https://example.com/signal/privacy"; // TODO: replace before launch
-export const SUPPORT_EMAIL = "support@example.com"; // TODO: replace before launch
+export const PRIVACY_POLICY_URL = "https://signalreset.app/privacy";
+export const TERMS_OF_SERVICE_URL = "https://signalreset.app/terms";
+export const SUPPORT_EMAIL = "support@signalreset.app";

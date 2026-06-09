@@ -87,6 +87,8 @@ export function Card({
 }) {
   return (
     <View
+      accessible={false}
+      accessibilityRole="none"
       style={[
         {
           backgroundColor: theme.colors.surface,
@@ -108,7 +110,7 @@ export function Card({
 
 export function SectionTitle({ title, detail }: { title: string; detail?: string }) {
   return (
-    <View style={{ gap: 4 }}>
+    <View accessible accessibilityRole="header" style={{ gap: 4 }}>
       <AppText
         style={{
           color: theme.colors.muted,
