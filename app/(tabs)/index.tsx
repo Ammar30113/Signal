@@ -43,7 +43,7 @@ export default function DashboardScreen() {
       <Card>
         <IntensitySlider value={snapshot.intensity} onChange={updateIntensity} />
         <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
-          <Metric label="Risk level" value={`${snapshot.riskScore}%`} detail={snapshot.trend} accentColor={current.accent} />
+          <Metric label="Urge level" value={`${snapshot.riskScore}%`} detail={snapshot.trend} accentColor={current.accent} />
           <Metric label="Progress" value={`${snapshot.progressDays}`} detail="days structured" />
         </Row>
         <ProgressBar value={snapshot.riskScore} color={current.accent} />

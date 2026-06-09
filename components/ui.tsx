@@ -1,5 +1,7 @@
 import React from "react";
 import {
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -28,19 +30,25 @@ export function Screen({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView
+    <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: theme.colors.background }}
-      contentContainerStyle={{
-        paddingHorizontal: theme.spacing.screen,
-        paddingTop: insets.top + 18,
-        paddingBottom: 118,
-        gap: 18,
-      }}
-      contentInsetAdjustmentBehavior="automatic"
-      keyboardShouldPersistTaps="handled"
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      {children}
-    </ScrollView>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: theme.colors.background }}
+        contentContainerStyle={{
+          paddingHorizontal: theme.spacing.screen,
+          paddingTop: insets.top + 18,
+          paddingBottom: 118,
+          gap: 18,
+        }}
+        contentInsetAdjustmentBehavior="automatic"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+      >
+        {children}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -206,12 +214,14 @@ export function Chip({
   onPress,
   style,
   textStyle,
+  accessibilityLabel,
 }: {
   label: string;
   selected?: boolean;
   onPress?: PressableProps["onPress"];
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
+  accessibilityLabel?: string;
 }) {
   const content = (
     <AppText
@@ -253,7 +263,7 @@ export function Chip({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ selected: !!selected }}
       style={({ pressed }) => [
         {

@@ -62,11 +62,20 @@ export function loadSignalState(): SignalPersistedState {
 }
 
 export function saveSignalState(state: SignalPersistedState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Persistence failed (quota, serialization). Keep the in-memory state so
+    // the session continues rather than crashing out of a render effect.
+  }
 }
 
 export function clearSignalState() {
-  localStorage.removeItem(STORAGE_KEY);
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Nothing to do; the next save will overwrite.
+  }
 }
 
 export function createSignalExport(state: SignalPersistedState) {

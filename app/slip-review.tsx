@@ -38,7 +38,7 @@ function Field({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={theme.colors.mutedDark}
+        placeholderTextColor={theme.colors.muted}
         multiline
         textAlignVertical="top"
         style={{

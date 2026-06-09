@@ -29,8 +29,8 @@ function BinaryRow({
     <Row style={{ justifyContent: "space-between", gap: 14 }}>
       <AppText style={{ flex: 1, color: theme.colors.textSoft }}>{label}</AppText>
       <Row>
-        <Chip label="No" selected={!value} onPress={() => onChange(false)} />
-        <Chip label="Yes" selected={value} onPress={() => onChange(true)} />
+        <Chip label="No" selected={!value} onPress={() => onChange(false)} accessibilityLabel={`No — ${label}`} />
+        <Chip label="Yes" selected={value} onPress={() => onChange(true)} accessibilityLabel={`Yes — ${label}`} />
       </Row>
     </Row>
   );

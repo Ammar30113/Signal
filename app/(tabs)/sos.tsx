@@ -32,11 +32,15 @@ export default function SosScreen() {
   const [reflectionReady, setReflectionReady] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
   const endAtRef = React.useRef<number | null>(null);
+  // True from Start until the session is reset/completed. Lets us tell a paused
+  // mid-countdown apart from a genuinely idle timer, so Pause never resets it.
+  const sessionActiveRef = React.useRef(false);
 
   // Keep the countdown aligned with the persisted protocol duration while the
   // timer is idle (covers settings hydration and the 5 / 10-minute chips).
+  // Skip while a session is active (running OR paused) so Pause preserves time.
   React.useEffect(() => {
-    if (running || reflectionReady) return;
+    if (sessionActiveRef.current || running || reflectionReady) return;
     setRemaining(duration);
   }, [duration, running, reflectionReady]);
 
@@ -56,6 +60,7 @@ export default function SosScreen() {
       setRemaining(left);
       if (left <= 0) {
         endAtRef.current = null;
+        sessionActiveRef.current = false;
         setRunning(false);
         setReflectionReady(true);
         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
@@ -79,6 +84,7 @@ export default function SosScreen() {
   }, [running]);
 
   const setProtocolDuration = (seconds: number) => {
+    sessionActiveRef.current = false;
     setRunning(false);
     setRemaining(seconds);
     setReflectionReady(false);
@@ -140,9 +146,12 @@ export default function SosScreen() {
                   setRemaining(duration);
                   setReflectionReady(false);
                   setSaved(false);
+                  sessionActiveRef.current = true;
                   setRunning(true);
                   return;
                 }
+                // Starting or pausing — the session stays active either way.
+                sessionActiveRef.current = true;
                 setRunning((current) => !current);
               }}
             />
@@ -152,6 +161,7 @@ export default function SosScreen() {
               label="Reflect now"
               tone="ghost"
               onPress={() => {
+                sessionActiveRef.current = false;
                 setRunning(false);
                 setRemaining(0);
                 setReflectionReady(true);
@@ -224,7 +234,7 @@ export default function SosScreen() {
           value={reflection}
           onChangeText={setReflection}
           placeholder="What helped the urge pass?"
-          placeholderTextColor={theme.colors.mutedDark}
+          placeholderTextColor={theme.colors.muted}
           multiline
           textAlignVertical="top"
           style={{

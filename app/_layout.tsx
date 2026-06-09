@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AppLockGate } from "@/components/app-lock-gate";
+import { PrivacyScreen } from "@/components/privacy-screen";
 import { theme } from "@/constants/theme";
 import { SignalProvider } from "@/context/signal-store";
 
@@ -75,6 +76,7 @@ export default function RootLayout() {
               />
             </Stack>
           </AppLockGate>
+          <PrivacyScreen />
         </SignalProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

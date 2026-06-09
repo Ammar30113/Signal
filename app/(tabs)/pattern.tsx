@@ -75,7 +75,7 @@ export default function PatternScreen() {
             <Row key={profile.trigger} style={{ justifyContent: "space-between" }}>
               <View style={{ flex: 1, gap: 4 }}>
                 <AppText style={{ fontSize: 16, fontWeight: "800" }}>{profile.trigger}</AppText>
-                <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>Average risk {profile.averageRisk}%</AppText>
+                <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>Avg urge level {profile.averageRisk}%</AppText>
               </View>
               <Chip label={`${profile.count}x`} selected />
             </Row>
