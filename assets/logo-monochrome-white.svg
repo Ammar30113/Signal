@@ -10,7 +10,7 @@
   </defs>
 
   <!-- Background -->
-  <rect width="1024" height="1024" fill="#000000" />
+  <rect width="1024" height="1024" fill="#08090D" />
   
   <!-- Outer Ring with Mask for Breaks -->
   <circle cx="512" cy="512" r="320" fill="none" stroke="#FFFFFF" stroke-width="70" mask="url(#ring-mask)" />
