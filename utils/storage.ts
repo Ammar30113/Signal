@@ -22,6 +22,7 @@ export interface SignalPersistedState {
 }
 
 export const defaultSettings: UserSettings = {
+  hasCompletedOnboarding: false,
   appLockEnabled: false,
   protocolDurationSeconds: 600,
 };

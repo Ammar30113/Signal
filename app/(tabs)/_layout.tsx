@@ -1,7 +1,8 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { Text, View } from "react-native";
 
 import { theme } from "@/constants/theme";
+import { useSignal } from "@/context/signal-store";
 
 function TabMark({
   label,
@@ -41,6 +42,12 @@ function TabMark({
 }
 
 export default function TabLayout() {
+  const { settings } = useSignal();
+
+  if (!settings.hasCompletedOnboarding) {
+    return <Redirect href="/onboarding" />;
+  }
+
   return (
     <Tabs
       screenOptions={{

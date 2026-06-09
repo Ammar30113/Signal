@@ -158,6 +158,7 @@ export interface PatternAggregate {
 }
 
 export interface UserSettings {
+  hasCompletedOnboarding: boolean;
   appLockEnabled: boolean;
   protocolDurationSeconds: number;
 }
