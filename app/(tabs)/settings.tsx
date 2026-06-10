@@ -1,6 +1,5 @@
 import Constants from "expo-constants";
 import { router } from "expo-router";
-import React from "react";
 import { Alert, Linking, Share, Switch, View } from "react-native";
 
 import { AppText, Button, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
