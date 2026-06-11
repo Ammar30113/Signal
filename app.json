@@ -14,14 +14,12 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.signal.reset",
-      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.signal.reset",
-      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#08090D",
         "foregroundImage": "./assets/android-icon-foreground.png",

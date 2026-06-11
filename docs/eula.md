@@ -74,7 +74,7 @@ The App operates on a **local-first, privacy-by-design** architecture:
 
 ### 4.2 Privacy Policy
 
-Your use of the App is also governed by our [Privacy Policy](https://signalreset.app/privacy), which describes our data practices in detail. By using the App, you consent to the practices described in the Privacy Policy.
+Your use of the App is also governed by our [Privacy Policy](https://ammar30113.github.io/Signal/privacy), which describes our data practices in detail. By using the App, you consent to the practices described in the Privacy Policy.
 
 ### 4.3 Biometric Authentication
 
@@ -104,7 +104,7 @@ A premium subscription tier ("Signal Pro") may be offered in a future update. If
 
 ### 6.1 Licensor Support
 
-The Licensor may, at its sole discretion, provide updates, bug fixes, or other maintenance for the App. The Licensor is not obligated to provide any maintenance or support services, but you may reach us at [support@signalreset.app](mailto:support@signalreset.app) for assistance.
+The Licensor may, at its sole discretion, provide updates, bug fixes, or other maintenance for the App. The Licensor is not obligated to provide any maintenance or support services, but you may reach us at [supportsignalteam@gmail.com](mailto:supportsignalteam@gmail.com) for assistance.
 
 ### 6.2 Apple's Role
 
@@ -198,7 +198,7 @@ The Licensor reserves the right to modify this Agreement at any time. Updated ve
 
 ## 14. Governing Law
 
-This Agreement shall be governed by and construed in accordance with the laws of the United States, without regard to conflict-of-law provisions. Any disputes arising under this Agreement shall be resolved in accordance with the dispute resolution provisions set forth in our [Terms of Service](https://signalreset.app/terms).
+This Agreement shall be governed by and construed in accordance with the laws of the United States, without regard to conflict-of-law provisions. Any disputes arising under this Agreement shall be resolved in accordance with the dispute resolution provisions set forth in our [Terms of Service](https://ammar30113.github.io/Signal/terms).
 
 ---
 
@@ -216,7 +216,7 @@ If any provision of this Agreement is found to be invalid or unenforceable, the 
 
 ## 17. Entire Agreement
 
-This Agreement, together with the [Terms of Service](https://signalreset.app/terms) and [Privacy Policy](https://signalreset.app/privacy), constitutes the entire agreement between you and the Licensor regarding the use of the App and supersedes all prior or contemporaneous agreements, understandings, and communications.
+This Agreement, together with the [Terms of Service](https://ammar30113.github.io/Signal/terms) and [Privacy Policy](https://ammar30113.github.io/Signal/privacy), constitutes the entire agreement between you and the Licensor regarding the use of the App and supersedes all prior or contemporaneous agreements, understandings, and communications.
 
 ---
 
@@ -224,8 +224,8 @@ This Agreement, together with the [Terms of Service](https://signalreset.app/ter
 
 If you have any questions about this EULA, please contact us at:
 
-📧 **Email:** [support@signalreset.app](mailto:support@signalreset.app)
+📧 **Email:** [supportsignalteam@gmail.com](mailto:supportsignalteam@gmail.com)
 
 ---
 
-_This End User License Agreement is also available at [https://signalreset.app/terms](https://signalreset.app/terms)._
+_This End User License Agreement is also available at [https://ammar30113.github.io/Signal/terms](https://ammar30113.github.io/Signal/terms)._

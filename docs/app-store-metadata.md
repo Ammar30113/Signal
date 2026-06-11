@@ -175,7 +175,7 @@ Suggested screenshots (in order):
 
 | Field | URL |
 |-------|-----|
-| Privacy Policy URL | `https://signalreset.app/privacy` |
-| Terms of Service URL | `https://signalreset.app/terms` |
-| Support URL | `https://signalreset.app/support` |
-| Marketing URL | `https://signalreset.app` (optional) |
+| Privacy Policy URL | `https://ammar30113.github.io/Signal/privacy` |
+| Terms of Service URL | `https://ammar30113.github.io/Signal/terms` |
+| Support URL | `https://ammar30113.github.io/Signal` |
+| Marketing URL | `https://ammar30113.github.io/Signal` (optional) |

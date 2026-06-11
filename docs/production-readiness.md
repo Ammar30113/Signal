@@ -62,8 +62,8 @@ To enable Pro (v1.1):
 - [x] Privacy Policy — production-grade at `docs/privacy-policy.md`
 - [x] Terms of Service — at `docs/terms-of-service.md`
 - [x] EULA — at `docs/eula.md`
-- [ ] Host privacy policy at `https://signalreset.app/privacy` (must be a live URL)
-- [ ] Host terms of service at `https://signalreset.app/terms`
+- [ ] Host privacy policy at `https://ammar30113.github.io/Signal/privacy` (must be a live URL)
+- [ ] Host terms of service at `https://ammar30113.github.io/Signal/terms`
 - [x] `ITSAppUsesNonExemptEncryption: false` set in `app.json`
 - [x] Face ID usage description set in `app.json`
 - [x] Age rating: 17+ (Frequent/Intense for Mature Themes and Sexual Content)

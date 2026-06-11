@@ -3,7 +3,7 @@
 _Effective date: June 9, 2026_
 _Last updated: June 9, 2026_
 
-Signal is a private, local-first urge-interruption app developed and published by ab3011s-organization. This policy explains, in plain language, what data Signal handles and how.
+Signal is a private, local-first habit-interruption app developed and published by ab3011s-organization. This policy explains, in plain language, what data Signal handles and how.
 
 ---
 
@@ -174,7 +174,7 @@ Signal is intended for adults and is rated **17+** on the App Store. The App dea
 
 ## Changes to This Policy
 
-If this policy changes, the updated version will be posted at [https://signalreset.app/privacy](https://signalreset.app/privacy) with a new "Last updated" date. If we make material changes, we will also update the privacy information within the App.
+If this policy changes, the updated version will be posted at [https://ammar30113.github.io/Signal/privacy](https://ammar30113.github.io/Signal/privacy) with a new "Last updated" date. If we make material changes, we will also update the privacy information within the App.
 
 ---
 
@@ -182,4 +182,4 @@ If this policy changes, the updated version will be posted at [https://signalres
 
 Questions or concerns about privacy? Contact us at:
 
-📧 **Email:** [support@signalreset.app](mailto:support@signalreset.app)
+📧 **Email:** [supportsignalteam@gmail.com](mailto:supportsignalteam@gmail.com)

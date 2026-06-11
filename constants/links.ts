@@ -9,6 +9,6 @@
 //
 // SUPPORT_EMAIL must be a monitored address.
 
-export const PRIVACY_POLICY_URL = "https://signalreset.app/privacy";
-export const TERMS_OF_SERVICE_URL = "https://signalreset.app/terms";
-export const SUPPORT_EMAIL = "support@signalreset.app";
+export const PRIVACY_POLICY_URL = "https://ammar30113.github.io/Signal/privacy";
+export const TERMS_OF_SERVICE_URL = "https://ammar30113.github.io/Signal/terms";
+export const SUPPORT_EMAIL = "supportsignalteam@gmail.com";
