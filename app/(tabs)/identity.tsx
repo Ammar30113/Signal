@@ -6,8 +6,6 @@ import { theme } from "@/constants/theme";
 import { identitySections } from "@/data/signal-data";
 import { useSignal } from "@/context/signal-store";
 
-// Remove unused array
-
 export default function IdentityScreen() {
   const { snapshot } = useSignal();
 

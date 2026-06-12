@@ -1,6 +1,5 @@
 import type {
   EmergencyAction,
-  PatternInsight,
   RationalizationScript,
   RedirectAction,
   SignalSnapshot,
@@ -73,51 +72,6 @@ export const initialSnapshot: SignalSnapshot = {
   progressDays: 0,
   lastCheckInSummary: "Run your first check-in to calibrate your signal.",
 };
-
-export const patternInsights: PatternInsight[] = [
-  {
-    id: "trigger-scroll",
-    kind: "trigger",
-    title: "Purposeless scrolling",
-    detail: "Usually starts as harmless browsing, then turns visual.",
-    weight: 82,
-  },
-  {
-    id: "state-lonely",
-    kind: "state",
-    title: "Lonely but calling it horny",
-    detail: "The body asks for novelty when the real signal is isolation.",
-    weight: 76,
-  },
-  {
-    id: "cue-bed",
-    kind: "cue",
-    title: "Phone in bed",
-    detail: "The highest-risk context is alone, horizontal, and unstructured.",
-    weight: 89,
-  },
-  {
-    id: "script-earned",
-    kind: "script",
-    title: "I earned it",
-    detail: "Reward logic appears after stress or milestone days.",
-    weight: 71,
-  },
-  {
-    id: "time-window",
-    kind: "time",
-    title: "10:40 PM - 12:15 AM",
-    detail: "Energy drops, privacy rises, friction disappears.",
-    weight: 84,
-  },
-  {
-    id: "milestone",
-    kind: "milestone",
-    title: "Day 7 / 14 / 21",
-    detail: "Progress can create permission-seeking. Watch reward bargaining.",
-    weight: 68,
-  },
-];
 
 export const escalationPath = [
   "Initial trigger",

@@ -39,7 +39,7 @@ v1 ships fully free. The RevenueCat integration is **built but dormant** — it 
 
 Already wired:
 
-- `react-native-purchases@10.2.2` (autolinks on prebuild; no config plugin needed)
+- `react-native-purchases@^10.3` (autolinks on prebuild; no config plugin needed)
 - `utils/purchases.ts` — wrapper with a lazy dynamic import; the native SDK is only loaded when a key is configured
 - `constants/revenuecat.ts` — `REVENUECAT_IOS_API_KEY` / `REVENUECAT_ANDROID_API_KEY` (empty = off), `PRO_ENTITLEMENT_ID = "pro"`, manage-subscription deep link
 - `app/paywall.tsx` — offerings list, purchase, restore, manage-subscription, privacy link

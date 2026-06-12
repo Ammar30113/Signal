@@ -42,7 +42,7 @@ export default function CheckInScreen() {
   const [intensity, setIntensity] = React.useState(snapshot.intensity);
   const [trigger, setTrigger] = React.useState<Trigger>(snapshot.topTrigger);
   const [emotionalDriver, setEmotionalDriver] = React.useState<EmotionalDriver>("mixed");
-  const [hasScrolled, setHasScrolled] = React.useState(true);
+  const [hasScrolled, setHasScrolled] = React.useState(false);
   const [exposedToContent, setExposedToContent] = React.useState(false);
   const [bargainingThoughts, setBargainingThoughts] = React.useState(false);
   const [result, setResult] = React.useState<CheckInResult | null>(null);

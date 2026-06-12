@@ -144,7 +144,7 @@ export default function SlipReviewScreen() {
         />
       </Card>
 
-      <Button label={saved ? "Review saved" : "Save review"} tone="primary" disabled={!canSave} onPress={handleSave} />
+      <Button label={saved ? "Review saved" : "Save review"} tone="primary" disabled={!canSave || saved} onPress={handleSave} />
 
       {saved ? (
         <Card accentColor={theme.colors.green}>
