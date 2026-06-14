@@ -108,7 +108,7 @@ export default function DashboardScreen() {
       <Card>
         <SectionTitle title="Trust stance" />
         <AppText style={{ color: theme.colors.textSoft, lineHeight: 22 }}>
-          No surveillance. No fake promises. No accounts. Everything you log stays on this device. Built from the system in Atomic Habits — identify the cue, interrupt the routine, redirect the reward.
+          No surveillance. No fake promises. No accounts. Everything you log stays on this device. Built from a habit-loop system: identify the cue, interrupt the routine, redirect the reward.
         </AppText>
       </Card>
     </Screen>

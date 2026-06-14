@@ -174,7 +174,7 @@ Signal is intended for adults and is rated **17+** on the App Store. The App dea
 
 ## Changes to This Policy
 
-If this policy changes, the updated version will be posted at [https://ammar30113.github.io/Signal/privacy](https://ammar30113.github.io/Signal/privacy) with a new "Last updated" date. If we make material changes, we will also update the privacy information within the App.
+If this policy changes, the updated version will be posted at [https://signal-ammars-projects-28b8a083.vercel.app/privacy](https://signal-ammars-projects-28b8a083.vercel.app/privacy) with a new "Last updated" date. If we make material changes, we will also update the privacy information within the App.
 
 ---
 

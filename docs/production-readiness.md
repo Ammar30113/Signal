@@ -62,8 +62,9 @@ To enable Pro (v1.1):
 - [x] Privacy Policy — production-grade at `docs/privacy-policy.md`
 - [x] Terms of Service — at `docs/terms-of-service.md`
 - [x] EULA — at `docs/eula.md`
-- [ ] Host privacy policy at `https://ammar30113.github.io/Signal/privacy` (must be a live URL)
-- [ ] Host terms of service at `https://ammar30113.github.io/Signal/terms`
+- [ ] Host privacy policy at `https://signal-ammars-projects-28b8a083.vercel.app/privacy` (must return unauthenticated 200)
+- [ ] Host terms of service at `https://signal-ammars-projects-28b8a083.vercel.app/terms` (must return unauthenticated 200)
+- [ ] Host support page at `https://signal-ammars-projects-28b8a083.vercel.app/support` (must return unauthenticated 200)
 - [x] `ITSAppUsesNonExemptEncryption: false` set in `app.json`
 - [x] Face ID usage description set in `app.json`
 - [x] Age rating: 17+ (Frequent/Intense for Mature Themes and Sexual Content)
@@ -85,13 +86,13 @@ To enable Pro (v1.1):
 
 ### App Configuration
 - [x] `constants/links.ts` — production URLs and support email
-- [x] `app.json` — bundle ID, version, build number set
+- [x] `app.json` — bundle ID, version, EAS project ID, and remote versioning configured
 - [x] EAS project ID configured
 - [x] Onboarding flow implemented
 - [x] App Lock with Face ID / Touch ID
 - [x] Data export and delete functionality
 - [x] Settings screen with Privacy Policy, Terms, and Support links
-- [x] App version displayed in Settings
+- [x] App version and native build metadata displayed in Settings
 
 ### Accessibility
 - [x] VoiceOver labels on all interactive elements (Buttons, Chips)
@@ -107,7 +108,7 @@ To enable Pro (v1.1):
 - [ ] TestFlight: Install and test on physical device
 - [ ] App Lock: Enable → background → return → biometric prompt appears
 - [ ] Onboarding: Clear data → relaunch → onboarding appears
-- [ ] SOS Timer: Verify timer continues when screen is locked
+- [ ] SOS Timer: Verify timer resumes accurately after app background / foreground
 - [ ] Check-in: Complete full flow → results appear on dashboard and pattern map
 - [ ] Slip Review: Complete flow → appears in pattern map
 - [ ] Data Export: Export → verify JSON contains all logged data

@@ -8,7 +8,7 @@ Use this document when filling out App Store Connect for iOS submission.
 
 | Field | Value |
 |-------|-------|
-| **App Name** | Signal: Urge Interruption |
+| **App Name** | Signal: Urge Reset |
 | **Subtitle** | Private 10-Minute Reset Protocol |
 | **Bundle ID** | `com.signal.reset` |
 | **SKU** | `signal-reset-v1` |
@@ -57,10 +57,10 @@ A private 10-minute urge interruption system. No surveillance. No blockers. No a
 Signal is a private behavioral control system for urge awareness, interruption, and redirection. It is not a porn blocker, not a surveillance tool, and not a shame-based streak app.
 
 THE 10-MINUTE PROTOCOL
-When an urge hits, Signal gives you a timed intervention: name the cue, choose an action, move your body, then reflect. The timer runs even when the screen is locked. Complete the protocol, log what helped, and build your personal pattern map over time.
+When an urge hits, Signal gives you a timed intervention: name the cue, choose an action, move your body, then reflect. Complete the protocol, log what helped, and build your personal pattern map over time.
 
 HOW IT WORKS
-• SOS Timer — 5 or 10-minute intervention with haptic feedback and background support
+• SOS Timer — 5 or 10-minute intervention with haptic feedback
 • Check-Ins — Classify your current state by naming your mood, trigger, and escalation cues
 • Slip Review — If the sequence crossed a line, review it without a shame spiral. No binge logic.
 • Pattern Map — See your top triggers, danger windows, emotion-trigger pairs, and which redirect actions actually lower your intensity
@@ -175,7 +175,7 @@ Suggested screenshots (in order):
 
 | Field | URL |
 |-------|-----|
-| Privacy Policy URL | `https://ammar30113.github.io/Signal/privacy` |
-| Terms of Service URL | `https://ammar30113.github.io/Signal/terms` |
-| Support URL | `https://ammar30113.github.io/Signal` |
-| Marketing URL | `https://ammar30113.github.io/Signal` (optional) |
+| Privacy Policy URL | `https://signal-ammars-projects-28b8a083.vercel.app/privacy` |
+| Terms of Service URL | `https://signal-ammars-projects-28b8a083.vercel.app/terms` |
+| Support URL | `https://signal-ammars-projects-28b8a083.vercel.app/support` |
+| Marketing URL | `https://signal-ammars-projects-28b8a083.vercel.app` (optional) |

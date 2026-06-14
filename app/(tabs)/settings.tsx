@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { Alert, Linking, Share, Switch, View } from "react-native";
 
 import { AppText, Button, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
-import { PRIVACY_POLICY_URL, SUPPORT_EMAIL, TERMS_OF_SERVICE_URL } from "@/constants/links";
+import { PRIVACY_POLICY_URL, SUPPORT_EMAIL, SUPPORT_URL, TERMS_OF_SERVICE_URL } from "@/constants/links";
 import { isProBillingEnabled } from "@/constants/revenuecat";
 import { theme } from "@/constants/theme";
 import { useSignal } from "@/context/signal-store";
@@ -83,11 +83,15 @@ export default function SettingsScreen() {
   };
 
   const handleSupport = () => {
-    void Linking.openURL(`mailto:${SUPPORT_EMAIL}`).catch(() => undefined);
+    void Linking.openURL(SUPPORT_URL).catch(() => {
+      void Linking.openURL(`mailto:${SUPPORT_EMAIL}`).catch(() => undefined);
+    });
   };
 
   const appVersion = Constants.expoConfig?.version ?? "1.0.0";
-  const buildNumber = Constants.expoConfig?.ios?.buildNumber ?? "1";
+  const nativeBuildNumber =
+    Constants.platform?.ios?.buildNumber ??
+    (Constants.platform?.android?.versionCode != null ? String(Constants.platform.android.versionCode) : null);
 
   return (
     <Screen>
@@ -173,7 +177,7 @@ export default function SettingsScreen() {
       <Card>
         <View style={{ alignItems: "center", gap: 4 }}>
           <AppText style={{ color: theme.colors.muted, fontSize: 13 }}>
-            Signal v{appVersion} ({buildNumber})
+            Signal v{appVersion}{nativeBuildNumber ? ` (${nativeBuildNumber})` : ""}
           </AppText>
           <AppText style={{ color: theme.colors.mutedDark, fontSize: 12 }}>
             Local-first. No account. No trackers.

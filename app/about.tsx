@@ -21,7 +21,7 @@ export default function AboutScreen() {
             Signal started because I read a book that changed how I think about habits.
           </AppText>
           <AppText style={{ color: theme.colors.textSoft, fontSize: 16, lineHeight: 26 }}>
-            James Clear's <AppText style={{ color: theme.colors.gold, fontWeight: "800", fontSize: 16 }}>Atomic Habits</AppText> breaks down something most people get wrong: you don't break a habit by forcing yourself to stop. You break it by building a system.
+            The framework that clicked was simple: you don't break a habit by forcing yourself to stop. You break it by building a system.
           </AppText>
           <AppText style={{ color: theme.colors.textSoft, fontSize: 16, lineHeight: 26 }}>
             Identify the cue. Interrupt the routine. Redirect the reward. Make the pattern visible so it loses power over you.
@@ -96,7 +96,7 @@ export default function AboutScreen() {
       </Card>
 
       <Card>
-        <SectionTitle title="The Atomic Habits framework" detail="The science behind Signal." />
+        <SectionTitle title="The habit-loop framework" detail="The system behind Signal." />
         <View style={{ gap: 10 }}>
           {[
             { label: "Cue", detail: "The trigger that starts the loop. Signal helps you name it." },
