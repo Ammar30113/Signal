@@ -42,6 +42,6 @@ npx eas build -p ios
 npx eas build -p android
 ```
 
-Before submitting: set `PRIVACY_POLICY_URL` and `SUPPORT_EMAIL` in `constants/links.ts`, host `docs/privacy-policy.md`, and set the App Store/Play age rating to 17+.
+Before submitting: set `PRIVACY_POLICY_URL` and `SUPPORT_EMAIL` in `constants/links.ts`, host `docs/privacy-policy.md`, and set the App Store/Play age rating to 18+.
 
 See [docs/production-readiness.md](docs/production-readiness.md) for launch and competitor-gap notes.
