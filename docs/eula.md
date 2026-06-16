@@ -74,7 +74,7 @@ The App operates on a **local-first, privacy-by-design** architecture:
 
 ### 4.2 Privacy Policy
 
-Your use of the App is also governed by our [Privacy Policy](https://signal-ammars-projects-28b8a083.vercel.app/privacy), which describes our data practices in detail. By using the App, you consent to the practices described in the Privacy Policy.
+Your use of the App is also governed by our [Privacy Policy](https://signal-liart-rho.vercel.app/privacy), which describes our data practices in detail. By using the App, you consent to the practices described in the Privacy Policy.
 
 ### 4.3 Biometric Authentication
 
@@ -198,7 +198,7 @@ The Licensor reserves the right to modify this Agreement at any time. Updated ve
 
 ## 14. Governing Law
 
-This Agreement shall be governed by and construed in accordance with the laws of the United States, without regard to conflict-of-law provisions. Any disputes arising under this Agreement shall be resolved in accordance with the dispute resolution provisions set forth in our [Terms of Service](https://signal-ammars-projects-28b8a083.vercel.app/terms).
+This Agreement shall be governed by and construed in accordance with the laws of the United States, without regard to conflict-of-law provisions. Any disputes arising under this Agreement shall be resolved in accordance with the dispute resolution provisions set forth in our [Terms of Service](https://signal-liart-rho.vercel.app/terms).
 
 ---
 
@@ -216,7 +216,7 @@ If any provision of this Agreement is found to be invalid or unenforceable, the 
 
 ## 17. Entire Agreement
 
-This Agreement, together with the [Terms of Service](https://signal-ammars-projects-28b8a083.vercel.app/terms) and [Privacy Policy](https://signal-ammars-projects-28b8a083.vercel.app/privacy), constitutes the entire agreement between you and the Licensor regarding the use of the App and supersedes all prior or contemporaneous agreements, understandings, and communications.
+This Agreement, together with the [Terms of Service](https://signal-liart-rho.vercel.app/terms) and [Privacy Policy](https://signal-liart-rho.vercel.app/privacy), constitutes the entire agreement between you and the Licensor regarding the use of the App and supersedes all prior or contemporaneous agreements, understandings, and communications.
 
 ---
 
@@ -228,4 +228,4 @@ If you have any questions about this EULA, please contact us at:
 
 ---
 
-_This End User License Agreement is also available at [https://signal-ammars-projects-28b8a083.vercel.app/terms](https://signal-ammars-projects-28b8a083.vercel.app/terms)._
+_This End User License Agreement is also available at [https://signal-liart-rho.vercel.app/terms](https://signal-liart-rho.vercel.app/terms)._

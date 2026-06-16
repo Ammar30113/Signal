@@ -62,9 +62,9 @@ To enable Pro (v1.1):
 - [x] Privacy Policy — production-grade at `docs/privacy-policy.md`
 - [x] Terms of Service — at `docs/terms-of-service.md`
 - [x] EULA — at `docs/eula.md`
-- [ ] Host privacy policy at `https://signal-ammars-projects-28b8a083.vercel.app/privacy` (must return unauthenticated 200)
-- [ ] Host terms of service at `https://signal-ammars-projects-28b8a083.vercel.app/terms` (must return unauthenticated 200)
-- [ ] Host support page at `https://signal-ammars-projects-28b8a083.vercel.app/support` (must return unauthenticated 200)
+- [ ] Host privacy policy at `https://signal-liart-rho.vercel.app/privacy` (must return unauthenticated 200)
+- [ ] Host terms of service at `https://signal-liart-rho.vercel.app/terms` (must return unauthenticated 200)
+- [ ] Host support page at `https://signal-liart-rho.vercel.app/support` (must return unauthenticated 200)
 - [x] `ITSAppUsesNonExemptEncryption: false` set in `app.json`
 - [x] Face ID usage description set in `app.json`
 - [x] Age rating: 17+ (Frequent/Intense for Mature Themes and Sexual Content)

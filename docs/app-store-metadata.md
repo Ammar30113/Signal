@@ -175,7 +175,7 @@ Suggested screenshots (in order):
 
 | Field | URL |
 |-------|-----|
-| Privacy Policy URL | `https://signal-ammars-projects-28b8a083.vercel.app/privacy` |
-| Terms of Service URL | `https://signal-ammars-projects-28b8a083.vercel.app/terms` |
-| Support URL | `https://signal-ammars-projects-28b8a083.vercel.app/support` |
-| Marketing URL | `https://signal-ammars-projects-28b8a083.vercel.app` (optional) |
+| Privacy Policy URL | `https://signal-liart-rho.vercel.app/privacy` |
+| Terms of Service URL | `https://signal-liart-rho.vercel.app/terms` |
+| Support URL | `https://signal-liart-rho.vercel.app/support` |
+| Marketing URL | `https://signal-liart-rho.vercel.app` (optional) |

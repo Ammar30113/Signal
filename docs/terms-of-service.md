@@ -50,7 +50,7 @@ Signal is built on a **local-first architecture**. This means:
 
 All data you enter into Signal — including check-ins, SOS sessions, slip reviews, reflections, and settings — is stored exclusively on your device using on-device storage.
 
-For full details on how your data is handled, please see our [Privacy Policy](https://signal-ammars-projects-28b8a083.vercel.app/privacy).
+For full details on how your data is handled, please see our [Privacy Policy](https://signal-liart-rho.vercel.app/privacy).
 
 ---
 
@@ -221,7 +221,7 @@ If any provision of these Terms is found to be unenforceable or invalid by a cou
 
 ## 15. Entire Agreement
 
-These Terms, together with our [Privacy Policy](https://signal-ammars-projects-28b8a083.vercel.app/privacy), constitute the entire agreement between you and ab3011s-organization regarding your use of Signal and supersede all prior agreements, understandings, and communications, whether oral or written.
+These Terms, together with our [Privacy Policy](https://signal-liart-rho.vercel.app/privacy), constitute the entire agreement between you and ab3011s-organization regarding your use of Signal and supersede all prior agreements, understandings, and communications, whether oral or written.
 
 ---
 
@@ -233,4 +233,4 @@ If you have questions, concerns, or feedback about these Terms, please contact u
 
 ---
 
-_These Terms of Service are also available at [https://signal-ammars-projects-28b8a083.vercel.app/terms](https://signal-ammars-projects-28b8a083.vercel.app/terms)._
+_These Terms of Service are also available at [https://signal-liart-rho.vercel.app/terms](https://signal-liart-rho.vercel.app/terms)._

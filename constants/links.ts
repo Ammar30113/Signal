@@ -9,7 +9,7 @@
 //
 // SUPPORT_EMAIL must be a monitored address.
 
-export const PRIVACY_POLICY_URL = "https://signal-ammars-projects-28b8a083.vercel.app/privacy";
-export const TERMS_OF_SERVICE_URL = "https://signal-ammars-projects-28b8a083.vercel.app/terms";
-export const SUPPORT_URL = "https://signal-ammars-projects-28b8a083.vercel.app/support";
+export const PRIVACY_POLICY_URL = "https://signal-liart-rho.vercel.app/privacy";
+export const TERMS_OF_SERVICE_URL = "https://signal-liart-rho.vercel.app/terms";
+export const SUPPORT_URL = "https://signal-liart-rho.vercel.app/support";
 export const SUPPORT_EMAIL = "supportsignalteam@gmail.com";
