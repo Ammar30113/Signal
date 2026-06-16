@@ -118,15 +118,15 @@ export default function SettingsScreen() {
         <SectionTitle title="Local data" detail="Export or delete what is stored on this device." />
         <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
           <View style={{ flex: 1 }}>
-            <AppText style={{ fontSize: 28, fontWeight: "900" }}>{checkIns.length}</AppText>
+            <AppText style={{ fontSize: 28, fontWeight: "900", lineHeight: 34 }}>{checkIns.length}</AppText>
             <AppText style={{ color: theme.colors.textSoft }}>check-ins</AppText>
           </View>
           <View style={{ flex: 1 }}>
-            <AppText style={{ fontSize: 28, fontWeight: "900" }}>{interventions.length}</AppText>
+            <AppText style={{ fontSize: 28, fontWeight: "900", lineHeight: 34 }}>{interventions.length}</AppText>
             <AppText style={{ color: theme.colors.textSoft }}>protocols</AppText>
           </View>
           <View style={{ flex: 1 }}>
-            <AppText style={{ fontSize: 28, fontWeight: "900" }}>{slipReviews.length}</AppText>
+            <AppText style={{ fontSize: 28, fontWeight: "900", lineHeight: 34 }}>{slipReviews.length}</AppText>
             <AppText style={{ color: theme.colors.textSoft }}>reviews</AppText>
           </View>
         </Row>
