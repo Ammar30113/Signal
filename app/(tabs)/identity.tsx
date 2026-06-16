@@ -37,7 +37,7 @@ export default function IdentityScreen() {
         <SectionTitle title="Today" />
         <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
           <View style={{ flex: 1, gap: 6 }}>
-            <AppText style={{ fontSize: 24, fontWeight: "900" }}>{snapshot.progressDays} days</AppText>
+            <AppText style={{ fontSize: 24, fontWeight: "900", lineHeight: 30 }}>{snapshot.progressDays} days</AppText>
             <AppText style={{ color: theme.colors.textSoft }}>
               Progress is useful data, not permission to test the edge.
             </AppText>

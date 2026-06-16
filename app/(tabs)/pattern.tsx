@@ -26,15 +26,15 @@ export default function PatternScreen() {
         <SectionTitle title="Local signal count" detail="No account, no surveillance, no screenshots." />
         <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
           <View style={{ flex: 1 }}>
-            <AppText style={{ fontSize: 28, fontWeight: "900" }}>{patternAggregate.totals.checkIns}</AppText>
+            <AppText style={{ fontSize: 28, fontWeight: "900", lineHeight: 34 }}>{patternAggregate.totals.checkIns}</AppText>
             <AppText style={{ color: theme.colors.textSoft }}>check-ins</AppText>
           </View>
           <View style={{ flex: 1 }}>
-            <AppText style={{ fontSize: 28, fontWeight: "900" }}>{patternAggregate.totals.completedInterventions}</AppText>
+            <AppText style={{ fontSize: 28, fontWeight: "900", lineHeight: 34 }}>{patternAggregate.totals.completedInterventions}</AppText>
             <AppText style={{ color: theme.colors.textSoft }}>protocols</AppText>
           </View>
           <View style={{ flex: 1 }}>
-            <AppText style={{ fontSize: 28, fontWeight: "900" }}>{patternAggregate.totals.slipReviews}</AppText>
+            <AppText style={{ fontSize: 28, fontWeight: "900", lineHeight: 34 }}>{patternAggregate.totals.slipReviews}</AppText>
             <AppText style={{ color: theme.colors.textSoft }}>reviews</AppText>
           </View>
         </Row>

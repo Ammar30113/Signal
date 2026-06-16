@@ -63,7 +63,7 @@ export default function DashboardScreen() {
         <SectionTitle title="Current trigger" detail="The useful question is where the sequence started." />
         {hasHistory ? (
           <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
-            <AppText style={{ fontSize: 22, fontWeight: "800", flex: 1 }}>{snapshot.topTrigger}</AppText>
+            <AppText style={{ fontSize: 22, fontWeight: "800", lineHeight: 28, flex: 1 }}>{snapshot.topTrigger}</AppText>
             <Chip label={current.label} selected />
           </Row>
         ) : (
