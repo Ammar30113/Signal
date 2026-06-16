@@ -9,7 +9,7 @@ Use this document when filling out App Store Connect for iOS submission.
 | Field | Value |
 |-------|-------|
 | **App Name** | Signal: Urge Reset |
-| **Subtitle** | Private 10-Minute Reset Protocol |
+| **Subtitle** | Private 10-Minute Urge Reset |
 | **Bundle ID** | `com.signal.reset` |
 | **SKU** | `signal-reset-v1` |
 | **Primary Language** | English (U.S.) |
@@ -38,7 +38,7 @@ Use this document when filling out App Store Connect for iOS submission.
 | Contests | None |
 | Unrestricted Web Access | None |
 
-**Expected Rating**: 17+
+**Expected Rating**: 18+
 
 > [!IMPORTANT]
 > The "Frequent/Intense" selections for Mature Themes and Sexual Content are required because Signal's core purpose involves pornography recovery. Apple requires honest disclosure even though the app contains no explicit content itself.
@@ -81,7 +81,7 @@ Most competitors rely on imperfect content blockers, surveillance screenshots, o
 • SOS and all core tools are free, permanently
 
 BUILT FOR ADULTS
-Signal is rated 17+ and designed for adults who want to change a behavioral pattern with dignity, structure, and privacy.
+Signal is rated 18+ and designed for adults who want to change a behavioral pattern with dignity, structure, and privacy.
 
 WHAT'S INCLUDED (FREE)
 • SOS 5/10-minute timer
@@ -107,7 +107,7 @@ urge,interrupt,habit,recovery,self-control,mindfulness,timer,private,no-tracker,
 ```
 Signal is a private, local-first behavioral interruption tool. It helps adults manage unwanted urges through a structured 10-minute protocol.
 
-All data is stored on-device only. There is no backend server, no user accounts, and no data collection. The app does not contain any explicit or sexual content — it is a recovery and self-improvement tool rated 17+ due to its subject matter.
+All data is stored on-device only. There is no backend server, no user accounts, and no data collection. The app does not contain any explicit or sexual content — it is a recovery and self-improvement tool rated 18+ due to its subject matter.
 
 Key features to test:
 1. Dashboard — shows current state, risk level, and redirect actions

@@ -67,7 +67,7 @@ To enable Pro (v1.1):
 - [ ] Host support page at `https://signal-liart-rho.vercel.app/support` (must return unauthenticated 200)
 - [x] `ITSAppUsesNonExemptEncryption: false` set in `app.json`
 - [x] Face ID usage description set in `app.json`
-- [x] Age rating: 17+ (Frequent/Intense for Mature Themes and Sexual Content)
+- [x] Age rating: 18+ (Frequent/Intense for Mature Themes and Sexual Content)
 
 ### App Store Connect Setup
 - [ ] Create app record in App Store Connect
@@ -125,7 +125,7 @@ To enable Pro (v1.1):
 
 ## App Review Tips
 
-1. **Subject matter explanation**: Include a clear note in App Review Notes explaining that this is a recovery/self-improvement tool, not a content app. Apple reviewers may flag the 17+ rating otherwise.
+1. **Subject matter explanation**: Include a clear note in App Review Notes explaining that this is a recovery/self-improvement tool, not a content app. Apple reviewers may flag the 18+ rating otherwise.
 
 2. **No backend**: Emphasize that the app is entirely local-first with no server calls. This simplifies review significantly.
 

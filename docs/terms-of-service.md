@@ -14,7 +14,7 @@ If you do not agree with these Terms, do not download, install, or use the App.
 By accessing or using Signal, you confirm that:
 
 - You have read, understood, and agree to these Terms.
-- You are at least **17 years of age** or the age of majority in your jurisdiction, whichever is greater.
+- You are at least **18 years of age** or the age of majority in your jurisdiction, whichever is greater.
 - You have the legal capacity to enter into a binding agreement.
 
 We may update these Terms from time to time. If we make material changes, we will update the "Last updated" date at the top of this page and, where practicable, notify you through the App. Your continued use of Signal after any changes constitutes your acceptance of the revised Terms.
@@ -72,9 +72,9 @@ You acknowledge that you are solely responsible for maintaining the security of 
 
 ## 5. Age Requirement
 
-Signal is rated **17+** and is intended for adult use only. The App deals with themes related to pornography recovery and sexual content awareness that are not appropriate for children.
+Signal is rated **18+** and is intended for adult use only. The App deals with themes related to pornography recovery and sexual content awareness that are not appropriate for children.
 
-By using Signal, you represent and warrant that you are at least 17 years of age. We do not knowingly collect information from or direct the App to anyone under the age of 17. If you are under 17, you may not use this App.
+By using Signal, you represent and warrant that you are at least 18 years of age. We do not knowingly collect information from or direct the App to anyone under the age of 18. If you are under 18, you may not use this App.
 
 ---
 

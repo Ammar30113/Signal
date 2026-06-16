@@ -168,7 +168,7 @@ Because Signal processes all data locally on your device and never transmits it 
 
 ## Children
 
-Signal is intended for adults and is rated **17+** on the App Store. The App deals with themes that are not appropriate for children. We do not knowingly collect information from anyone under the age of 17. If you are under 17, do not use this App.
+Signal is intended for adults and is rated **18+** on the App Store. The App deals with themes that are not appropriate for children. We do not knowingly collect information from anyone under the age of 18. If you are under 18, do not use this App.
 
 ---
 
