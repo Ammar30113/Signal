@@ -74,7 +74,7 @@ export default function DashboardScreen() {
       </Card>
 
       <View style={{ gap: 12 }}>
-        <SectionTitle title="Redirect actions" detail="Move the body before the mind starts negotiating." />
+        <SectionTitle title="Redirect actions" detail="Pause the urge, then move the body before the mind starts negotiating." />
         {redirects.map((action) => (
           <Card key={action.id} style={{ backgroundColor: theme.colors.backgroundSoft }}>
             <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -86,6 +86,12 @@ export default function DashboardScreen() {
             </Row>
           </Card>
         ))}
+        <Button label="Start a pause" tone="primary" onPress={() => router.push("/pause")} />
+        {patternAggregate.totals.pauses > 0 ? (
+          <AppText style={{ color: theme.colors.muted }}>
+            {patternAggregate.totals.pauses} pause{patternAggregate.totals.pauses === 1 ? "" : "s"} taken on this device.
+          </AppText>
+        ) : null}
       </View>
 
       <Card>

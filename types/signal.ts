@@ -107,6 +107,21 @@ export interface InterventionSession {
   completed: boolean;
 }
 
+/**
+ * A lightweight, fast urge interruption — the tier below the full SOS protocol.
+ * Deliberately minimal: it records the wait length and the single redirect the
+ * user committed to, not mood/trigger/intensity. The payoff is the redirect, not
+ * analysis, so a pause stays a few taps rather than a whole reflection.
+ */
+export interface PauseSession {
+  id: string;
+  createdAt: string;
+  durationSeconds: number;
+  redirectId: string;
+  redirectTitle: string;
+  completed: boolean;
+}
+
 export interface SlipReview {
   id: string;
   createdAt: string;
@@ -154,6 +169,7 @@ export interface PatternAggregate {
     checkIns: number;
     interventions: number;
     completedInterventions: number;
+    pauses: number;
     slipReviews: number;
   };
 }
@@ -162,6 +178,8 @@ export interface UserSettings {
   hasCompletedOnboarding: boolean;
   appLockEnabled: boolean;
   protocolDurationSeconds: number;
+  pauseDurationSeconds: number;
+  highRiskRemindersEnabled: boolean;
 }
 
 export interface Entitlement {

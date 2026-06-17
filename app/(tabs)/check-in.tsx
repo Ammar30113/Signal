@@ -126,11 +126,20 @@ export default function CheckInScreen() {
             <AppText style={{ color: theme.colors.textSoft, fontSize: 17 }}>{result.summary}</AppText>
             <AppText style={{ color: theme.colors.muted }}>{result.nextStep}</AppText>
           </View>
-          <Button
-            label={result.state === "red" ? "Open SOS" : "Return to dashboard"}
-            tone={result.state === "red" ? "danger" : "secondary"}
-            onPress={() => router.navigate(result.state === "red" ? "/sos" : "/")}
-          />
+          {result.state === "red" ? (
+            <Button label="Open SOS" tone="danger" onPress={() => router.navigate("/sos")} />
+          ) : result.state === "yellow" ? (
+            <Row style={{ alignItems: "stretch" }}>
+              <View style={{ flex: 1 }}>
+                <Button label="Return" tone="ghost" onPress={() => router.navigate("/")} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button label="Take a pause" tone="primary" onPress={() => router.push("/pause")} />
+              </View>
+            </Row>
+          ) : (
+            <Button label="Return to dashboard" tone="secondary" onPress={() => router.navigate("/")} />
+          )}
         </Card>
       ) : null}
     </Screen>

@@ -47,7 +47,8 @@
         {
           "faceIDPermission": "Signal uses Face ID to keep your check-ins and history private on this device."
         }
-      ]
+      ],
+      "@bacons/apple-targets"
     ],
     "extra": {
       "router": {},

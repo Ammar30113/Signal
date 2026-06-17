@@ -7,6 +7,7 @@ import { PRIVACY_POLICY_URL, SUPPORT_EMAIL, SUPPORT_URL, TERMS_OF_SERVICE_URL } 
 import { isProBillingEnabled } from "@/constants/revenuecat";
 import { theme } from "@/constants/theme";
 import { useSignal } from "@/context/signal-store";
+import { cancelHighRiskReminders, ensureNotificationPermission } from "@/utils/notifications";
 
 function SettingRow({
   title,
@@ -41,12 +42,33 @@ export default function SettingsScreen() {
     settings,
     updateSettings,
     entitlement,
+    setLocalEntitlement,
+    patternAggregate,
     exportLocalData,
     clearLocalData,
     checkIns,
     interventions,
     slipReviews,
   } = useSignal();
+
+  const hasDangerWindows = patternAggregate.dangerWindows.some((window) => window.count > 0);
+
+  const handleToggleReminders = async (next: boolean) => {
+    if (next) {
+      const allowed = await ensureNotificationPermission();
+      if (!allowed) {
+        Alert.alert(
+          "Notifications are off",
+          "Turn on notifications for Signal in your device settings to use high-risk reminders.",
+        );
+        return;
+      }
+      updateSettings({ highRiskRemindersEnabled: true });
+    } else {
+      updateSettings({ highRiskRemindersEnabled: false });
+      void cancelHighRiskReminders().catch(() => undefined);
+    }
+  };
 
   const handleExport = async () => {
     if (checkIns.length + interventions.length + slipReviews.length === 0) {
@@ -141,6 +163,35 @@ export default function SettingsScreen() {
         <Button label="Contact support" tone="ghost" onPress={handleSupport} />
       </Card>
 
+      <Card accentColor={theme.colors.gold}>
+        <SectionTitle
+          title="High-risk reminders"
+          detail="A gentle, local nudge during the windows you tend to be most vulnerable — learned only from your own history on this device."
+        />
+        {entitlement.plan === "pro" ? (
+          <>
+            <SettingRow
+              title="Daily reminders"
+              detail="Notifies you around your top danger windows so you can check in or pause early."
+              value={settings.highRiskRemindersEnabled}
+              onChange={handleToggleReminders}
+            />
+            {settings.highRiskRemindersEnabled && !hasDangerWindows ? (
+              <AppText style={{ color: theme.colors.muted, fontSize: 13 }}>
+                Reminders start once your pattern map has enough check-ins to find your high-risk windows.
+              </AppText>
+            ) : null}
+          </>
+        ) : (
+          <Row style={{ justifyContent: "space-between", alignItems: "center", gap: 16 }}>
+            <AppText style={{ flex: 1, color: theme.colors.textSoft, fontSize: 13 }}>
+              Arrives with Signal Pro. Panic tools stay free forever — this is an optional extra, never a paywalled crisis tool.
+            </AppText>
+            <Chip label="Pro" selected />
+          </Row>
+        )}
+      </Card>
+
       {isProBillingEnabled() ? (
         <Card accentColor={theme.colors.gold}>
           <SectionTitle
@@ -173,6 +224,18 @@ export default function SettingsScreen() {
           Signal is a self-help tool, not a substitute for professional medical or mental health care. If you are in crisis, contact a licensed professional or local emergency services.
         </AppText>
       </Card>
+
+      {__DEV__ ? (
+        <Card accentColor={theme.colors.blue}>
+          <SectionTitle title="Developer" detail="Debug builds only — never shipped to users." />
+          <SettingRow
+            title="Simulate Signal Pro"
+            detail="Unlock Pro-gated features locally to test them, like high-risk reminders."
+            value={entitlement.plan === "pro"}
+            onChange={(on) => setLocalEntitlement(on ? "pro" : "free")}
+          />
+        </Card>
+      ) : null}
 
       <Card>
         <View style={{ alignItems: "center", gap: 4 }}>

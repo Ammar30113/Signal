@@ -5,6 +5,7 @@ import type {
   CheckInEntry,
   Entitlement,
   InterventionSession,
+  PauseSession,
   SignalSnapshot,
   SlipReview,
   UserSettings,
@@ -16,6 +17,7 @@ export interface SignalPersistedState {
   snapshot: SignalSnapshot;
   checkIns: CheckInEntry[];
   interventions: InterventionSession[];
+  pauses: PauseSession[];
   slipReviews: SlipReview[];
   settings: UserSettings;
   entitlement: Entitlement;
@@ -25,6 +27,8 @@ export const defaultSettings: UserSettings = {
   hasCompletedOnboarding: false,
   appLockEnabled: false,
   protocolDurationSeconds: 600,
+  pauseDurationSeconds: 60,
+  highRiskRemindersEnabled: false,
 };
 
 export const defaultEntitlement: Entitlement = {
@@ -36,6 +40,7 @@ export const defaultPersistedState: SignalPersistedState = {
   snapshot: initialSnapshot,
   checkIns: [],
   interventions: [],
+  pauses: [],
   slipReviews: [],
   settings: defaultSettings,
   entitlement: defaultEntitlement,
@@ -52,6 +57,7 @@ export function loadSignalState(): SignalPersistedState {
       snapshot: parsed.snapshot ?? defaultPersistedState.snapshot,
       checkIns: parsed.checkIns ?? [],
       interventions: parsed.interventions ?? [],
+      pauses: parsed.pauses ?? [],
       slipReviews: parsed.slipReviews ?? [],
       settings: { ...defaultSettings, ...parsed.settings },
       entitlement: { ...defaultEntitlement, ...parsed.entitlement },

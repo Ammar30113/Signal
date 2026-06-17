@@ -68,6 +68,13 @@ export default function RootLayout() {
                 }}
               />
               <Stack.Screen
+                name="pause"
+                options={{
+                  title: "Pause",
+                  presentation: "card",
+                }}
+              />
+              <Stack.Screen
                 name="paywall"
                 options={{
                   title: "Signal Pro",

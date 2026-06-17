@@ -5,6 +5,7 @@ import type {
   CheckInResult,
   EmergencyAction,
   InterventionSession,
+  PauseSession,
   PatternAggregate,
   PatternInsight,
   RationalizationScript,
@@ -56,7 +57,7 @@ export function classifyCheckIn(answer: CheckInAnswer): CheckInResult {
       state,
       riskScore,
       summary: "Drift detected. The useful move is interruption, not analysis.",
-      nextStep: "Take the 10-minute protocol. Move first, reflect after.",
+      nextStep: "Interrupt early. Take a short pause, then move into one action.",
     };
   }
 
@@ -86,10 +87,12 @@ function topEntries<K extends string>(map: Map<K, number>, limit: number) {
 export function buildPatternAggregate({
   checkIns,
   interventions,
+  pauses = [],
   slipReviews,
 }: {
   checkIns: CheckInEntry[];
   interventions: InterventionSession[];
+  pauses?: PauseSession[];
   slipReviews: SlipReview[];
 }): PatternAggregate {
   const triggerCounts = new Map<Trigger, number>();
@@ -196,6 +199,7 @@ export function buildPatternAggregate({
       checkIns: checkIns.length,
       interventions: interventions.length,
       completedInterventions: interventions.filter((session) => session.completed).length,
+      pauses: pauses.length,
       slipReviews: slipReviews.length,
     },
   };
