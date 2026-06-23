@@ -4,9 +4,12 @@
     "name": "Signal",
     "slug": "signal",
     "scheme": "signal",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "runtimeVersion": {
       "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/146ba146-c7cb-4821-804f-4f70e2daf811"
     },
     "orientation": "portrait",
     "icon": "./assets/icon.png",

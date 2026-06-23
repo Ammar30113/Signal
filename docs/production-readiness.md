@@ -47,6 +47,21 @@ Already wired:
 - Store: `entitlement` is synced from RevenueCat (with a customer-info listener) only when billing is enabled; `refreshEntitlement()` exposed
 - Settings: a Pro entry that appears only when `isProBillingEnabled()` is true
 
+## EAS Update Notes
+
+OTA updates are configured with `expo-updates`, `updates.url`, and EAS build channels:
+
+- `development` profile -> `development` channel
+- `preview` and `preview-simulator` profiles -> `preview` channel
+- `production` profile -> `production` channel
+
+Use OTA only for JavaScript, asset, and copy changes that are compatible with the same native runtime. Native dependency changes, native config changes, widgets, permissions, and SDK changes still require a new EAS build and App Store submission.
+
+Publish commands:
+
+- Preview/internal test: `eas update --channel preview --message "Describe the change"`
+- Production patch: `eas update --channel production --message "Describe the change"`
+
 To enable Pro (v1.1):
 
 1. Create the RevenueCat project; add the iOS + Android apps; set the `pro` entitlement and an offering with monthly + annual packages.
