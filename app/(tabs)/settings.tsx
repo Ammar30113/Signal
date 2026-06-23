@@ -1,6 +1,7 @@
 import Constants from "expo-constants";
 import { router } from "expo-router";
-import { Alert, Linking, Share, Switch, View } from "react-native";
+import React from "react";
+import { Alert, Linking, Share, Switch, TextInput, View, type TextInputProps } from "react-native";
 
 import { AppText, Button, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
 import { PRIVACY_POLICY_URL, SUPPORT_EMAIL, SUPPORT_URL, TERMS_OF_SERVICE_URL } from "@/constants/links";
@@ -37,6 +38,59 @@ function SettingRow({
   );
 }
 
+function SettingsTextField({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  multiline,
+  keyboardType,
+}: {
+  label: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder: string;
+  multiline?: boolean;
+  keyboardType?: TextInputProps["keyboardType"];
+}) {
+  return (
+    <View style={{ gap: 8 }}>
+      <AppText
+        style={{
+          color: theme.colors.muted,
+          fontSize: 12,
+          fontWeight: "800",
+          letterSpacing: 2.4,
+          textTransform: "uppercase",
+        }}
+      >
+        {label}
+      </AppText>
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.muted}
+        multiline={multiline}
+        keyboardType={keyboardType}
+        textAlignVertical={multiline ? "top" : "center"}
+        style={{
+          minHeight: multiline ? 92 : 52,
+          color: theme.colors.text,
+          backgroundColor: theme.colors.surfaceMuted,
+          borderColor: theme.colors.border,
+          borderWidth: 1,
+          borderRadius: theme.radius.md,
+          borderCurve: "continuous",
+          padding: 14,
+          fontSize: 15,
+          lineHeight: 21,
+        }}
+      />
+    </View>
+  );
+}
+
 export default function SettingsScreen() {
   const {
     settings,
@@ -48,10 +102,54 @@ export default function SettingsScreen() {
     clearLocalData,
     checkIns,
     interventions,
+    pauses,
     slipReviews,
+    customRedirects,
+    addCustomRedirect,
+    deleteCustomRedirect,
   } = useSignal();
 
+  const [customRedirectTitle, setCustomRedirectTitle] = React.useState("");
+  const [customRedirectDetail, setCustomRedirectDetail] = React.useState("");
+  const [customRedirectMinutes, setCustomRedirectMinutes] = React.useState("5");
+
   const hasDangerWindows = patternAggregate.dangerWindows.some((window) => window.count > 0);
+  const parsedCustomRedirectMinutes = Number.parseInt(customRedirectMinutes, 10);
+  const canAddCustomRedirect =
+    customRedirectTitle.trim().length > 0 &&
+    customRedirectDetail.trim().length > 0 &&
+    Number.isInteger(parsedCustomRedirectMinutes) &&
+    parsedCustomRedirectMinutes >= 1;
+
+  const handleAddCustomRedirect = () => {
+    if (!canAddCustomRedirect) {
+      Alert.alert("Add a complete redirect", "Enter a title, action detail, and a duration of at least 1 minute.");
+      return;
+    }
+
+    const minutes = Math.min(120, parsedCustomRedirectMinutes);
+    const saved = addCustomRedirect({
+      title: customRedirectTitle,
+      detail: customRedirectDetail,
+      duration: `${minutes} min`,
+    });
+
+    if (!saved) {
+      Alert.alert("Could not save redirect", "Check the title, detail, and duration, then try again.");
+      return;
+    }
+
+    setCustomRedirectTitle("");
+    setCustomRedirectDetail("");
+    setCustomRedirectMinutes("5");
+  };
+
+  const handleDeleteCustomRedirect = (id: string, title: string) => {
+    Alert.alert("Delete custom redirect?", title, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Delete", style: "destructive", onPress: () => deleteCustomRedirect(id) },
+    ]);
+  };
 
   const handleToggleReminders = async (next: boolean) => {
     if (next) {
@@ -71,8 +169,8 @@ export default function SettingsScreen() {
   };
 
   const handleExport = async () => {
-    if (checkIns.length + interventions.length + slipReviews.length === 0) {
-      Alert.alert("Nothing to export yet", "Log a check-in, SOS session, or slip review first.");
+    if (checkIns.length + interventions.length + pauses.length + slipReviews.length + customRedirects.length === 0) {
+      Alert.alert("Nothing to export yet", "Log a check-in, pause, SOS session, slip review, or custom redirect first.");
       return;
     }
     try {
@@ -88,7 +186,7 @@ export default function SettingsScreen() {
   const handleClear = () => {
     Alert.alert(
       "Delete local Signal data?",
-      "This clears check-ins, SOS sessions, slip reviews, and settings stored on this device. It cannot be undone.",
+      "This clears check-ins, pauses, SOS sessions, slip reviews, custom redirects, and settings stored on this device. It cannot be undone.",
       [
         { text: "Cancel", style: "cancel" },
         { text: "Delete", style: "destructive", onPress: clearLocalData },
@@ -148,12 +246,65 @@ export default function SettingsScreen() {
             <AppText style={{ color: theme.colors.textSoft }}>protocols</AppText>
           </View>
           <View style={{ flex: 1 }}>
+            <AppText style={{ fontSize: 28, fontWeight: "900", lineHeight: 34 }}>{pauses.length}</AppText>
+            <AppText style={{ color: theme.colors.textSoft }}>pauses</AppText>
+          </View>
+          <View style={{ flex: 1 }}>
             <AppText style={{ fontSize: 28, fontWeight: "900", lineHeight: 34 }}>{slipReviews.length}</AppText>
             <AppText style={{ color: theme.colors.textSoft }}>reviews</AppText>
           </View>
         </Row>
         <Button label="Export local data" tone="secondary" onPress={handleExport} />
         <Button label="Delete local data" tone="ghost" onPress={handleClear} />
+      </Card>
+
+      <Card accentColor={theme.colors.gold}>
+        <SectionTitle
+          title="Custom redirects"
+          detail="Add personal actions to the dashboard and pause flow. Stored only on this device."
+        />
+        <SettingsTextField
+          label="Title"
+          value={customRedirectTitle}
+          onChangeText={setCustomRedirectTitle}
+          placeholder="Walk to the lobby"
+        />
+        <SettingsTextField
+          label="Action detail"
+          value={customRedirectDetail}
+          onChangeText={setCustomRedirectDetail}
+          placeholder="Shoes on, no phone, one loop outside."
+          multiline
+        />
+        <SettingsTextField
+          label="Duration minutes"
+          value={customRedirectMinutes}
+          onChangeText={(text) => setCustomRedirectMinutes(text.replace(/[^0-9]/g, "").slice(0, 3))}
+          placeholder="5"
+          keyboardType="number-pad"
+        />
+        <Button label="Add redirect" tone="primary" disabled={!canAddCustomRedirect} onPress={handleAddCustomRedirect} />
+        {customRedirects.length === 0 ? (
+          <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>
+            No custom redirects yet. The default redirects stay available.
+          </AppText>
+        ) : (
+          customRedirects.map((redirect) => (
+            <Row key={redirect.id} style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+              <View style={{ flex: 1, gap: 4 }}>
+                <AppText style={{ fontSize: 16, fontWeight: "800" }}>{redirect.title}</AppText>
+                <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>{redirect.detail}</AppText>
+                <Chip label={redirect.duration} />
+              </View>
+              <Button
+                label="Delete"
+                tone="ghost"
+                onPress={() => handleDeleteCustomRedirect(redirect.id, redirect.title)}
+                style={{ minHeight: 44, paddingHorizontal: 12 }}
+              />
+            </Row>
+          ))
+        )}
       </Card>
 
       <Card>
@@ -209,7 +360,7 @@ export default function SettingsScreen() {
       <Card accentColor={theme.colors.gold}>
         <SectionTitle title="What's included" detail="Everything in Signal is free. Panic tools never sit behind a paywall." />
         <Wrap>
-          {["SOS timer", "Check-ins", "Slip review", "Pattern map", "App lock", "Privacy controls"].map((item) => (
+          {["SOS timer", "Pause timer", "Check-ins", "Slip review", "Pattern map", "Weekly review", "Custom redirects", "App lock", "Privacy controls"].map((item) => (
             <Chip key={item} label={item} selected />
           ))}
         </Wrap>

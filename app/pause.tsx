@@ -6,7 +6,6 @@ import { AppState, Pressable, View } from "react-native";
 
 import { AppText, Button, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle } from "@/components/ui";
 import { theme } from "@/constants/theme";
-import { redirectActions } from "@/data/signal-data";
 import { useSignal } from "@/context/signal-store";
 import type { RedirectAction } from "@/types/signal";
 
@@ -55,7 +54,7 @@ function RedirectOption({
 }
 
 export default function PauseScreen() {
-  const { settings, updateSettings, completePause, pauses } = useSignal();
+  const { settings, updateSettings, completePause, pauses, redirects } = useSignal();
   const duration = settings.pauseDurationSeconds;
   const [remaining, setRemaining] = React.useState(duration);
   const [running, setRunning] = React.useState(false);
@@ -64,14 +63,26 @@ export default function PauseScreen() {
   // timer ran all the way down, which is what we persist as `completed`.
   const [arrived, setArrived] = React.useState(false);
   const [waitedFully, setWaitedFully] = React.useState(false);
-  const [redirectId, setRedirectId] = React.useState(redirectActions[0].id);
+  const [redirectId, setRedirectId] = React.useState<string | null>(null);
   const [saved, setSaved] = React.useState(false);
   const endAtRef = React.useRef<number | null>(null);
   // True from Start until the pause is reset/committed. Lets us tell a paused
   // mid-countdown apart from a genuinely idle timer, so Pause never resets it.
   const sessionActiveRef = React.useRef(false);
 
-  const selectedRedirect = redirectActions.find((item) => item.id === redirectId) ?? redirectActions[0];
+  const selectedRedirect =
+    redirects.find((item) => item.id === redirectId) ??
+    redirects[0] ?? {
+      id: "fallback",
+      title: "Walk without phone",
+      detail: "Change state before thinking through it.",
+      duration: "12 min",
+    };
+
+  React.useEffect(() => {
+    if (redirectId && redirects.some((item) => item.id === redirectId)) return;
+    setRedirectId(redirects[0]?.id ?? null);
+  }, [redirectId, redirects]);
 
   // Keep the countdown aligned with the persisted pause duration while the timer
   // is idle (covers settings hydration and the 30 / 60 / 90-second chips). Skip
@@ -238,7 +249,7 @@ export default function PauseScreen() {
           detail="Pick the move now, so the pause lands on a real action instead of looping back to the feed."
         />
         <View style={{ gap: 12 }}>
-          {redirectActions.map((action) => (
+          {redirects.map((action) => (
             <RedirectOption
               key={action.id}
               action={action}

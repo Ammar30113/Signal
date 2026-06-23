@@ -11,11 +11,11 @@ import { useSignal } from "@/context/signal-store";
 import { getProOffering, purchasePackage, restorePurchases } from "@/utils/purchases";
 
 const PRO_FEATURES = [
-  "Full pattern intelligence — complete history and deeper correlations",
-  "Custom redirect protocols and timer durations",
-  "Weekly review and long-term trends",
+  "Advanced trend comparisons and guided weekly planning",
+  "Expanded protocol templates and recovery playbooks",
   "High-risk reminders for your danger windows",
   "Encrypted backup and multi-device sync (coming soon)",
+  "Support Signal's private, tracker-free development",
 ];
 
 export default function PaywallScreen() {

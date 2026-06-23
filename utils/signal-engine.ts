@@ -14,7 +14,10 @@ import type {
   Trigger,
   TriggerProfile,
   UrgeState,
+  WeeklyReview,
 } from "@/types/signal";
+
+const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
 export function getStateFromScore(score: number): UrgeState {
   if (score >= 72) return "red";
@@ -202,6 +205,87 @@ export function buildPatternAggregate({
       pauses: pauses.length,
       slipReviews: slipReviews.length,
     },
+  };
+}
+
+function isWithinWindow(isoDate: string, startMs: number, endMs: number) {
+  const time = Date.parse(isoDate);
+  return Number.isFinite(time) && time >= startMs && time <= endMs;
+}
+
+function pluralize(count: number, singular: string, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
+export function buildWeeklyReview({
+  checkIns,
+  interventions,
+  pauses = [],
+  slipReviews,
+  now = new Date(),
+}: {
+  checkIns: CheckInEntry[];
+  interventions: InterventionSession[];
+  pauses?: PauseSession[];
+  slipReviews: SlipReview[];
+  now?: Date;
+}): WeeklyReview {
+  const endedAt = now.toISOString();
+  const startMs = now.getTime() - WEEK_IN_MS;
+  const startedAt = new Date(startMs).toISOString();
+
+  const weeklyCheckIns = checkIns.filter((entry) => isWithinWindow(entry.createdAt, startMs, now.getTime()));
+  const weeklyInterventions = interventions.filter((entry) => isWithinWindow(entry.createdAt, startMs, now.getTime()));
+  const weeklyPauses = pauses.filter((entry) => isWithinWindow(entry.createdAt, startMs, now.getTime()));
+  const weeklySlipReviews = slipReviews.filter((entry) => isWithinWindow(entry.createdAt, startMs, now.getTime()));
+
+  const aggregate = buildPatternAggregate({
+    checkIns: weeklyCheckIns,
+    interventions: weeklyInterventions,
+    pauses: weeklyPauses,
+    slipReviews: weeklySlipReviews,
+  });
+  const totalSignals =
+    aggregate.totals.checkIns + aggregate.totals.interventions + aggregate.totals.pauses + aggregate.totals.slipReviews;
+  const topTrigger = aggregate.topTriggers[0];
+  const topDangerWindow = aggregate.dangerWindows.find((window) => window.count > 0);
+  const bestRedirect = aggregate.successfulRedirectActions[0];
+
+  if (totalSignals === 0) {
+    return {
+      startedAt,
+      endedAt,
+      headline: "No weekly pattern yet.",
+      focus: "Log a check-in, pause, SOS session, or slip review this week so Signal can summarize what is actually happening.",
+      totalSignals,
+      totals: aggregate.totals,
+    };
+  }
+
+  let headline = `${pluralize(totalSignals, "signal")} this week.`;
+  if (topTrigger) {
+    headline += ` Top trigger: ${topTrigger.trigger}.`;
+  }
+
+  let focus = "Keep logging the moment before the loop starts; that is where the pattern becomes interruptible.";
+  if (bestRedirect) {
+    focus = `Repeat ${bestRedirect.action} when the urge climbs; it has lowered intensity by ${bestRedirect.averageDrop} points on average.`;
+  } else if (topDangerWindow) {
+    focus = `Protect ${topDangerWindow.label} with a pre-decided action before the urge turns into browsing.`;
+  } else if (topTrigger) {
+    focus = `Plan one concrete redirect for ${topTrigger.trigger} before it shows up again.`;
+  }
+
+  return {
+    startedAt,
+    endedAt,
+    headline,
+    focus,
+    totalSignals,
+    totals: aggregate.totals,
+    topTrigger,
+    topDangerWindow,
+    bestRedirect,
   };
 }
 

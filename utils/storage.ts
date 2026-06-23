@@ -6,6 +6,7 @@ import type {
   Entitlement,
   InterventionSession,
   PauseSession,
+  RedirectAction,
   SignalSnapshot,
   SlipReview,
   UserSettings,
@@ -19,6 +20,7 @@ export interface SignalPersistedState {
   interventions: InterventionSession[];
   pauses: PauseSession[];
   slipReviews: SlipReview[];
+  customRedirects: RedirectAction[];
   settings: UserSettings;
   entitlement: Entitlement;
 }
@@ -42,6 +44,7 @@ export const defaultPersistedState: SignalPersistedState = {
   interventions: [],
   pauses: [],
   slipReviews: [],
+  customRedirects: [],
   settings: defaultSettings,
   entitlement: defaultEntitlement,
 };
@@ -59,6 +62,7 @@ export function loadSignalState(): SignalPersistedState {
       interventions: parsed.interventions ?? [],
       pauses: parsed.pauses ?? [],
       slipReviews: parsed.slipReviews ?? [],
+      customRedirects: parsed.customRedirects ?? [],
       settings: { ...defaultSettings, ...parsed.settings },
       entitlement: { ...defaultEntitlement, ...parsed.entitlement },
     };

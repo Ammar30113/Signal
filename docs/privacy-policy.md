@@ -1,7 +1,7 @@
 # Signal Privacy Policy
 
 _Effective date: June 9, 2026_
-_Last updated: June 9, 2026_
+_Last updated: June 23, 2026_
 
 Signal is a private, local-first habit-interruption app developed and published by ab3011s-organization. This policy explains, in plain language, what data Signal handles and how.
 
@@ -23,9 +23,11 @@ Signal lets you log information to help you notice and interrupt urges, includin
 
 - **Check-ins** — mood, urge intensity, triggers, loneliness signal, escalation cues, and classification results
 - **SOS / intervention sessions** — timer use, chosen redirect action, emotion, trigger, before/after intensity, and your written reflection
+- **Pause sessions** — short pause timer use, chosen redirect action, and whether the pause was completed
 - **Slip reviews** — your notes about what happened, the trigger, the rationalization script, and what would help next time
-- **Pattern data** — aggregated locally from check-ins, interventions, and reviews (top triggers, danger windows, redirect effectiveness)
-- **App settings** — protocol duration preference, whether App Lock is enabled, and onboarding completion status
+- **Custom redirect protocols** — optional personal redirect titles, details, and durations you create
+- **Pattern data** — aggregated locally from check-ins, pauses, interventions, and reviews (top triggers, danger windows, weekly review, redirect effectiveness)
+- **App settings** — protocol duration preference, pause duration preference, high-risk reminder preference, whether App Lock is enabled, onboarding completion status, and review-prompt state
 
 All of this is stored locally on your device using on-device storage (expo-sqlite/localStorage). It is **never** transmitted to Signal, ab3011s-organization, or any third party.
 
@@ -36,7 +38,9 @@ All of this is stored locally on your device using on-device storage (expo-sqlit
 Your data is used **solely on your device** to:
 
 - Show your current state, risk level, and trends on the dashboard
-- Build your local pattern map (top triggers, danger windows, emotion-trigger pairs, redirects that worked)
+- Build your local pattern map and weekly review (top triggers, danger windows, emotion-trigger pairs, redirects that worked)
+- Show your custom redirects inside the dashboard and pause flow
+- Schedule optional local high-risk reminders on your device if you enable them
 - Derive insights about your behavioral patterns over time
 
 There is no remote processing. We never see your entries. We cannot access your data even if we wanted to.
@@ -78,6 +82,8 @@ Signal uses the following open-source frameworks, **none of which collect user d
 | expo-local-authentication | Face ID / Touch ID for App Lock | None — biometric auth is handled by iOS |
 | expo-haptics | Haptic feedback on interactions | None |
 | expo-keep-awake | Keep screen on during SOS timer | None |
+| expo-notifications | Optional local high-risk reminders | None — no push token or server is used |
+| expo-store-review | Native App Store review prompt | None from Signal; Apple controls App Store review flows |
 
 No analytics SDKs (such as Firebase Analytics, Mixpanel, or Amplitude) are included. No advertising SDKs are included. No crash reporting SDKs are included.
 
@@ -89,6 +95,7 @@ When you download Signal from the Apple App Store, **Apple** may collect certain
 
 - Crash logs and diagnostics (if you have opted in to share analytics with app developers in your iOS Settings)
 - Basic download and usage metrics visible to us in App Store Connect (aggregate, non-identifying)
+- App Store review interactions if iOS chooses to show the native review prompt
 
 This data is collected and controlled by Apple, not by Signal. We do not have access to any personally identifiable information through App Store Connect analytics.
 
@@ -120,7 +127,7 @@ A local entitlement status (free or pro) is stored on your device to determine w
 
 Your data remains on your device until you delete it. You have two options:
 
-1. **Delete local data** — Use the "Delete local data" button on the Privacy screen. This immediately and permanently removes all check-ins, SOS sessions, slip reviews, settings, and pattern data.
+1. **Delete local data** — Use the "Delete local data" button on the Privacy screen. This immediately and permanently removes all check-ins, pauses, SOS sessions, slip reviews, custom redirects, settings, and pattern data.
 2. **Delete the app** — Uninstalling Signal from your device also removes all locally stored data.
 
 Because we never receive your data, there is nothing for us to delete on our end. There is no account to close.

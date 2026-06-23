@@ -62,6 +62,8 @@ export interface RedirectAction {
   duration: string;
 }
 
+export type RedirectActionInput = Omit<RedirectAction, "id">;
+
 export interface CheckInAnswer {
   mood: string;
   intensity: number; // 0-100
@@ -174,12 +176,32 @@ export interface PatternAggregate {
   };
 }
 
+export interface WeeklyReview {
+  startedAt: string;
+  endedAt: string;
+  headline: string;
+  focus: string;
+  totalSignals: number;
+  totals: PatternAggregate["totals"];
+  topTrigger?: TriggerProfile;
+  topDangerWindow?: {
+    label: string;
+    count: number;
+  };
+  bestRedirect?: {
+    action: EmergencyAction;
+    count: number;
+    averageDrop: number;
+  };
+}
+
 export interface UserSettings {
   hasCompletedOnboarding: boolean;
   appLockEnabled: boolean;
   protocolDurationSeconds: number;
   pauseDurationSeconds: number;
   highRiskRemindersEnabled: boolean;
+  lastReviewPromptedAt?: string;
 }
 
 export interface Entitlement {

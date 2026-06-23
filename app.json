@@ -14,6 +14,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.signal.reset",
+      "appStoreUrl": "https://apps.apple.com/us/app/signal-urge-reset/id6776899029",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }

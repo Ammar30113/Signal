@@ -61,13 +61,15 @@ When an urge hits, Signal gives you a timed intervention: name the cue, choose a
 
 HOW IT WORKS
 • SOS Timer — 5 or 10-minute intervention with haptic feedback
+• Pause Timer — 30, 60, or 90-second urge delay before a concrete redirect
 • Check-Ins — Classify your current state by naming your mood, trigger, and escalation cues
 • Slip Review — If the sequence crossed a line, review it without a shame spiral. No binge logic.
-• Pattern Map — See your top triggers, danger windows, emotion-trigger pairs, and which redirect actions actually lower your intensity
+• Pattern Map — See your top triggers, danger windows, weekly review, emotion-trigger pairs, and which redirect actions actually lower your intensity
+• Custom Redirects — Save personal redirect actions that appear in the dashboard and pause flow
 • Identity Anchoring — Remember who you are becoming and what this protects
 
 PRIVACY FIRST
-Signal has no accounts, no analytics, no trackers, and no screenshots. Your check-ins, SOS sessions, and slip reviews are stored only on your device. You can export or permanently delete your data at any time from the Privacy screen.
+Signal has no accounts, no analytics, no trackers, and no screenshots. Your check-ins, pauses, SOS sessions, custom redirects, and slip reviews are stored only on your device. You can export or permanently delete your data at any time from the Privacy screen.
 
 App Lock keeps Signal private with Face ID, Touch ID, or your device passcode.
 
@@ -85,9 +87,11 @@ Signal is rated 18+ and designed for adults who want to change a behavioral patt
 
 WHAT'S INCLUDED (FREE)
 • SOS 5/10-minute timer
+• Pause timer
 • Check-ins with mood, trigger, and cue classification
 • Slip review with recovery stance
-• Pattern map with trigger profiles and danger windows
+• Pattern map with trigger profiles, danger windows, and weekly review
+• Custom redirect protocols
 • Identity anchoring
 • App Lock (Face ID / Touch ID)
 • Full data export and delete
@@ -113,8 +117,9 @@ Key features to test:
 1. Dashboard — shows current state, risk level, and redirect actions
 2. Check-In — multi-step urge classification
 3. SOS — timed intervention protocol with reflection
-4. Pattern Map — aggregated insights from local data
-5. Settings — data export, data deletion, App Lock toggle, privacy policy, terms of service
+4. Pause — short timer that logs a selected redirect action
+5. Pattern Map — aggregated insights and weekly review from local data
+6. Settings — custom redirects, data export, data deletion, App Lock toggle, privacy policy, terms of service
 
 App Lock (Face ID) can be enabled in Settings > Privacy Posture. To test: enable App Lock, background the app, then return to it.
 

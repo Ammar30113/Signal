@@ -1,6 +1,6 @@
 import { initialSnapshot } from "@/data/signal-data";
-import type { CheckInAnswer, CheckInEntry, InterventionSession, SlipReview } from "@/types/signal";
-import { buildPatternAggregate, classifyCheckIn, deriveSnapshot } from "@/utils/signal-engine";
+import type { CheckInAnswer, CheckInEntry, InterventionSession, PauseSession, SlipReview } from "@/types/signal";
+import { buildPatternAggregate, buildWeeklyReview, classifyCheckIn, deriveSnapshot } from "@/utils/signal-engine";
 
 function assertEqual<T>(actual: T, expected: T, message?: string) {
   if (actual !== expected) {
@@ -87,15 +87,26 @@ const slipReview: SlipReview = {
   next24Hours: "Sleep, train, and keep the phone out of bed.",
 };
 
+const pause: PauseSession = {
+  id: "pause-test",
+  createdAt: "2026-06-05T01:00:00.000Z",
+  durationSeconds: 60,
+  redirectId: "walk",
+  redirectTitle: "Walk without phone",
+  completed: true,
+};
+
 const aggregate = buildPatternAggregate({
   checkIns: [checkIn],
   interventions: [intervention],
+  pauses: [pause],
   slipReviews: [slipReview],
 });
 
 assertEqual(aggregate.totals.checkIns, 1);
 assertEqual(aggregate.totals.interventions, 1);
 assertEqual(aggregate.totals.completedInterventions, 1);
+assertEqual(aggregate.totals.pauses, 1);
 assertEqual(aggregate.totals.slipReviews, 1);
 
 const lateNight = aggregate.topTriggers.find((profile) => profile.trigger === "Late-night phone");
@@ -119,6 +130,30 @@ const emptyAggregate = buildPatternAggregate({
 assertEqual(emptyAggregate.totals.checkIns, 0);
 // With no data, insights must be empty rather than fabricated seed data.
 assertEqual(emptyAggregate.insights.length, 0);
+
+const weeklyReview = buildWeeklyReview({
+  checkIns: [checkIn],
+  interventions: [intervention],
+  pauses: [pause],
+  slipReviews: [slipReview],
+  now: new Date("2026-06-06T00:00:00.000Z"),
+});
+
+assertEqual(weeklyReview.totalSignals, 4);
+assertEqual(weeklyReview.totals.pauses, 1);
+assertEqual(weeklyReview.topTrigger?.trigger, "Late-night phone");
+assertEqual(weeklyReview.bestRedirect?.action, "Walk outside");
+
+const emptyWeeklyReview = buildWeeklyReview({
+  checkIns: [checkIn],
+  interventions: [intervention],
+  pauses: [pause],
+  slipReviews: [slipReview],
+  now: new Date("2026-07-01T00:00:00.000Z"),
+});
+
+assertEqual(emptyWeeklyReview.totalSignals, 0);
+assertEqual(emptyWeeklyReview.headline, "No weekly pattern yet.");
 
 // A slip review must drive the snapshot when it is the most recent event,
 // even if a check-in and an intervention already exist.

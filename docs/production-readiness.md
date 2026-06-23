@@ -13,18 +13,19 @@
 Free forever:
 
 - SOS 5/10-minute timer
+- Pause timer
 - Basic check-ins
 - Slip review
-- Basic pattern summary
+- Custom redirect protocols
+- Weekly review and basic pattern summary
+- App lock
 - Export/delete privacy controls
 
 Signal Pro:
 
-- Advanced local pattern intelligence
-- Custom redirect protocols
-- Weekly review
 - High-risk reminders
-- App lock
+- Advanced trend comparisons and guided weekly planning
+- Expanded protocol templates and recovery playbooks
 - Future encrypted backup
 
 Target pricing:

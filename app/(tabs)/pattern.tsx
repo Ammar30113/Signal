@@ -5,14 +5,19 @@ import { AppText, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle, Wr
 import { theme } from "@/constants/theme";
 import { escalationPath } from "@/data/signal-data";
 import { useSignal } from "@/context/signal-store";
+import { buildWeeklyReview } from "@/utils/signal-engine";
 
 function labelForKind(kind: string) {
   return kind.replace("-", " ").toUpperCase();
 }
 
 export default function PatternScreen() {
-  const { patternAggregate } = useSignal();
+  const { patternAggregate, checkIns, interventions, pauses, slipReviews } = useSignal();
   const insights = patternAggregate.insights;
+  const weeklyReview = React.useMemo(
+    () => buildWeeklyReview({ checkIns, interventions, pauses, slipReviews }),
+    [checkIns, interventions, pauses, slipReviews],
+  );
 
   return (
     <Screen>
@@ -42,6 +47,35 @@ export default function PatternScreen() {
             <AppText style={{ color: theme.colors.textSoft }}>reviews</AppText>
           </View>
         </Row>
+      </Card>
+
+      <Card accentColor={theme.colors.gold}>
+        <SectionTitle title="Weekly review" detail="A local summary of the last 7 days." />
+        <AppText style={{ fontSize: 20, lineHeight: 27, fontWeight: "900" }}>{weeklyReview.headline}</AppText>
+        <AppText style={{ color: theme.colors.textSoft }}>{weeklyReview.focus}</AppText>
+        <Row style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontSize: 26, fontWeight: "900", lineHeight: 32 }}>{weeklyReview.totals.checkIns}</AppText>
+            <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>check-ins</AppText>
+          </View>
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontSize: 26, fontWeight: "900", lineHeight: 32 }}>{weeklyReview.totals.completedInterventions}</AppText>
+            <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>protocols</AppText>
+          </View>
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontSize: 26, fontWeight: "900", lineHeight: 32 }}>{weeklyReview.totals.pauses}</AppText>
+            <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>pauses</AppText>
+          </View>
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontSize: 26, fontWeight: "900", lineHeight: 32 }}>{weeklyReview.totals.slipReviews}</AppText>
+            <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>reviews</AppText>
+          </View>
+        </Row>
+        <Wrap>
+          {weeklyReview.topTrigger ? <Chip label={`Trigger: ${weeklyReview.topTrigger.trigger}`} selected /> : null}
+          {weeklyReview.topDangerWindow ? <Chip label={`Window: ${weeklyReview.topDangerWindow.label}`} /> : null}
+          {weeklyReview.bestRedirect ? <Chip label={`Best: ${weeklyReview.bestRedirect.action}`} /> : null}
+        </Wrap>
       </Card>
 
       <Card>

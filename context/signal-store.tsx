@@ -11,6 +11,7 @@ import type {
   PauseSession,
   PatternAggregate,
   RedirectAction,
+  RedirectActionInput,
   SignalSnapshot,
   SlipReview,
   UserSettings,
@@ -19,6 +20,7 @@ import { buildPatternAggregate, classifyCheckIn, deriveSnapshot, getStateFromSco
 import { isProBillingEnabled } from "@/constants/revenuecat";
 import { addPlanListener, getCurrentPlan } from "@/utils/purchases";
 import { scheduleHighRiskReminders } from "@/utils/notifications";
+import { maybeRequestStoreReview } from "@/utils/review-prompt";
 import {
   clearSignalState,
   createSignalExport,
@@ -33,6 +35,7 @@ import {
 interface SignalContextValue {
   snapshot: SignalSnapshot;
   redirects: RedirectAction[];
+  customRedirects: RedirectAction[];
   checkIns: CheckInEntry[];
   interventions: InterventionSession[];
   pauses: PauseSession[];
@@ -46,6 +49,8 @@ interface SignalContextValue {
   completeIntervention: (session: Omit<InterventionSession, "id" | "createdAt" | "completedAt" | "completed">) => InterventionSession;
   completePause: (session: Omit<PauseSession, "id" | "createdAt">) => PauseSession;
   saveSlipReview: (review: Omit<SlipReview, "id" | "createdAt">) => SlipReview;
+  addCustomRedirect: (input: RedirectActionInput) => RedirectAction | null;
+  deleteCustomRedirect: (id: string) => void;
   updateSettings: (patch: Partial<UserSettings>) => void;
   setLocalEntitlement: (plan: Entitlement["plan"]) => void;
   refreshEntitlement: () => Promise<void>;
@@ -71,9 +76,11 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
   const [interventions, setInterventions] = React.useState<InterventionSession[]>([]);
   const [pauses, setPauses] = React.useState<PauseSession[]>([]);
   const [slipReviews, setSlipReviews] = React.useState<SlipReview[]>([]);
+  const [customRedirects, setCustomRedirects] = React.useState<RedirectAction[]>([]);
   const [settings, setSettings] = React.useState<UserSettings>(defaultSettings);
   const [entitlement, setEntitlement] = React.useState<Entitlement>(defaultEntitlement);
   const [isHydrated, setIsHydrated] = React.useState(false);
+  const reviewPromptPendingRef = React.useRef(false);
 
   React.useEffect(() => {
     const persisted = loadSignalState();
@@ -82,6 +89,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     setInterventions(persisted.interventions);
     setPauses(persisted.pauses);
     setSlipReviews(persisted.slipReviews);
+    setCustomRedirects(persisted.customRedirects);
     setSettings(persisted.settings);
     setEntitlement(persisted.entitlement);
     setIsHydrated(true);
@@ -96,10 +104,11 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       interventions,
       pauses,
       slipReviews,
+      customRedirects,
       settings,
       entitlement,
     });
-  }, [checkIns, entitlement, interventions, isHydrated, pauses, settings, slipReviews, snapshot]);
+  }, [checkIns, customRedirects, entitlement, interventions, isHydrated, pauses, settings, slipReviews, snapshot]);
 
   // Sync entitlement from RevenueCat — only when billing is configured.
   // With no API key this never runs, so the free build stays purely local.
@@ -141,6 +150,38 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
   const patternAggregate = React.useMemo(
     () => buildPatternAggregate({ checkIns, interventions, pauses, slipReviews }),
     [checkIns, interventions, pauses, slipReviews],
+  );
+  const redirects = React.useMemo(() => [...redirectActions, ...customRedirects], [customRedirects]);
+
+  const maybePromptForReview = React.useCallback(
+    ({
+      interventions: nextInterventions,
+      pauses: nextPauses,
+      slipReviews: nextSlipReviews,
+    }: {
+      interventions: InterventionSession[];
+      pauses: PauseSession[];
+      slipReviews: SlipReview[];
+    }) => {
+      if (!isHydrated || settings.lastReviewPromptedAt || reviewPromptPendingRef.current) return;
+
+      const meaningfulActions =
+        nextInterventions.filter((session) => session.completed).length + nextPauses.length + nextSlipReviews.length;
+      if (meaningfulActions < 3) return;
+
+      reviewPromptPendingRef.current = true;
+      void maybeRequestStoreReview()
+        .then((requested) => {
+          if (!requested) return;
+          setSettings((current) =>
+            current.lastReviewPromptedAt ? current : { ...current, lastReviewPromptedAt: new Date().toISOString() },
+          );
+        })
+        .finally(() => {
+          reviewPromptPendingRef.current = false;
+        });
+    },
+    [isHydrated, settings.lastReviewPromptedAt],
   );
 
   // Keep high-risk reminders aligned with the latest danger windows. Pro + opt-in
@@ -213,36 +254,43 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       };
 
       notifySelection();
+      const nextInterventions = [saved, ...interventions];
       setInterventions((current) => [saved, ...current]);
       setSnapshot((current) =>
         deriveSnapshot({
           current,
           checkIns,
-          interventions: [saved, ...interventions],
+          interventions: nextInterventions,
           slipReviews,
         }),
       );
+      maybePromptForReview({ interventions: nextInterventions, pauses, slipReviews });
 
       return saved;
     },
-    [checkIns, interventions, slipReviews],
+    [checkIns, interventions, maybePromptForReview, pauses, slipReviews],
   );
 
   // A pause is deliberately self-contained: it logs the interruption but does not
   // recompute the global snapshot. A micro-pause is a nudge, not a re-classification
   // of the urge state, so it never overrides the most recent check-in / SOS / slip.
-  const completePause = React.useCallback((session: Omit<PauseSession, "id" | "createdAt">) => {
-    const saved: PauseSession = {
-      ...session,
-      id: createId("pause"),
-      createdAt: new Date().toISOString(),
-    };
+  const completePause = React.useCallback(
+    (session: Omit<PauseSession, "id" | "createdAt">) => {
+      const saved: PauseSession = {
+        ...session,
+        id: createId("pause"),
+        createdAt: new Date().toISOString(),
+      };
 
-    notifySelection();
-    setPauses((current) => [saved, ...current]);
+      notifySelection();
+      const nextPauses = [saved, ...pauses];
+      setPauses((current) => [saved, ...current]);
+      maybePromptForReview({ interventions, pauses: nextPauses, slipReviews });
 
-    return saved;
-  }, []);
+      return saved;
+    },
+    [interventions, maybePromptForReview, pauses, slipReviews],
+  );
 
   const saveSlipReview = React.useCallback((review: Omit<SlipReview, "id" | "createdAt">) => {
     const saved: SlipReview = {
@@ -265,6 +313,30 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     return saved;
   }, [checkIns, interventions, slipReviews]);
 
+  const addCustomRedirect = React.useCallback((input: RedirectActionInput) => {
+    const title = input.title.trim().slice(0, 56);
+    const detail = input.detail.trim().slice(0, 140);
+    const duration = input.duration.trim().slice(0, 20);
+
+    if (!title || !detail || !duration) return null;
+
+    const saved: RedirectAction = {
+      id: createId("redirect"),
+      title,
+      detail,
+      duration,
+    };
+
+    setCustomRedirects((current) => [saved, ...current]);
+    notifySelection();
+    return saved;
+  }, []);
+
+  const deleteCustomRedirect = React.useCallback((id: string) => {
+    setCustomRedirects((current) => current.filter((redirect) => redirect.id !== id));
+    notifySelection();
+  }, []);
+
   const updateSettings = React.useCallback((patch: Partial<UserSettings>) => {
     setSettings((current) => ({ ...current, ...patch }));
     notifySelection();
@@ -286,12 +358,13 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       interventions,
       pauses,
       slipReviews,
+      customRedirects,
       settings,
       entitlement,
     };
 
     return createSignalExport(state);
-  }, [checkIns, entitlement, interventions, pauses, settings, slipReviews, snapshot]);
+  }, [checkIns, customRedirects, entitlement, interventions, pauses, settings, slipReviews, snapshot]);
 
   const clearLocalData = React.useCallback(() => {
     clearSignalState();
@@ -300,6 +373,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     setInterventions([]);
     setPauses([]);
     setSlipReviews([]);
+    setCustomRedirects([]);
     setSettings(defaultSettings);
     setEntitlement(defaultEntitlement);
     notifySelection();
@@ -308,7 +382,8 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
   const value = React.useMemo(
     () => ({
       snapshot,
-      redirects: redirectActions,
+      redirects,
+      customRedirects,
       checkIns,
       interventions,
       pauses,
@@ -322,6 +397,8 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       completeIntervention,
       completePause,
       saveSlipReview,
+      addCustomRedirect,
+      deleteCustomRedirect,
       updateSettings,
       setLocalEntitlement,
       refreshEntitlement,
@@ -331,9 +408,12 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       checkIns,
+      customRedirects,
+      addCustomRedirect,
       clearLocalData,
       completeIntervention,
       completePause,
+      deleteCustomRedirect,
       entitlement,
       exportLocalData,
       interventions,
@@ -341,6 +421,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       patternAggregate,
       pauses,
       refreshEntitlement,
+      redirects,
       saveSlipReview,
       settings,
       setLocalEntitlement,
