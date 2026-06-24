@@ -1,5 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { AppState, TextInput, View } from "react-native";
 
@@ -18,14 +19,34 @@ function formatTime(seconds: number) {
   return `${minutes}:${remainder.toString().padStart(2, "0")}`;
 }
 
+type ProtocolParams = {
+  action?: string | string[];
+  trigger?: string | string[];
+};
+
+function readParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function resolveInitialAction(value: string | string[] | undefined): EmergencyAction {
+  const action = readParam(value);
+  return emergencyActions.includes(action as EmergencyAction) ? (action as EmergencyAction) : "Walk outside";
+}
+
+function resolveInitialTrigger(value: string | string[] | undefined, fallback: Trigger): Trigger {
+  const trigger = readParam(value);
+  return triggers.includes(trigger as Trigger) ? (trigger as Trigger) : fallback;
+}
+
 export default function SosScreen() {
   const { snapshot, settings, updateSettings, completeIntervention } = useSignal();
+  const params = useLocalSearchParams<ProtocolParams>();
   const duration = settings.protocolDurationSeconds;
   const [remaining, setRemaining] = React.useState(duration);
   const [running, setRunning] = React.useState(false);
-  const [selectedAction, setSelectedAction] = React.useState<EmergencyAction>("Walk outside");
+  const [selectedAction, setSelectedAction] = React.useState<EmergencyAction>(() => resolveInitialAction(params.action));
   const [emotion, setEmotion] = React.useState("Restless");
-  const [trigger, setTrigger] = React.useState<Trigger>(snapshot.topTrigger);
+  const [trigger, setTrigger] = React.useState<Trigger>(() => resolveInitialTrigger(params.trigger, snapshot.topTrigger));
   const [intensityBefore, setIntensityBefore] = React.useState(snapshot.intensity);
   const [intensityAfter, setIntensityAfter] = React.useState(Math.max(0, snapshot.intensity - 18));
   const [reflection, setReflection] = React.useState("");

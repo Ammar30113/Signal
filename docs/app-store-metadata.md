@@ -49,15 +49,17 @@ Use this document when filling out App Store Connect for iOS submission.
 
 ### Promotional Text (170 characters)
 ```
-A private 10-minute urge interruption system. No surveillance. No blockers. No accounts. Everything stays on your device.
+Catch the cue before the loop feels automatic. Run a private 10-minute urge reset with no accounts, trackers, or surveillance.
 ```
 
 ### Description (4000 characters max)
 ```
-Signal is a private behavioral control system for urge awareness, interruption, and redirection. It is not a porn blocker, not a surveillance tool, and not a shame-based streak app.
+Signal is a private behavioral control system for urge awareness, interruption, and redirection. It helps you connect two practical facts: the urge usually starts before the action, and a 10-minute physical interruption can change your state before the loop feels automatic.
+
+It is not a porn blocker, not a surveillance tool, and not a shame-based streak app.
 
 THE 10-MINUTE PROTOCOL
-When an urge hits, Signal gives you a timed intervention: name the cue, choose an action, move your body, then reflect. Complete the protocol, log what helped, and build your personal pattern map over time.
+When an urge hits, Signal gives you a timed intervention: name the cue, choose an action, move your body, then reflect. During onboarding, you build a first protocol from your likely trigger and the redirect action that changes your state fastest. Complete the protocol, log what helped, and build your personal pattern map over time.
 
 HOW IT WORKS
 • SOS Timer — 5 or 10-minute intervention with haptic feedback
@@ -74,7 +76,7 @@ Signal has no accounts, no analytics, no trackers, and no screenshots. Your chec
 App Lock keeps Signal private with Face ID, Touch ID, or your device passcode.
 
 WHAT MAKES SIGNAL DIFFERENT
-Most competitors rely on imperfect content blockers, surveillance screenshots, or shame-driven streaks. Signal addresses the gap they miss: the 10-minute window between urge and action where a simple interruption is the most effective intervention.
+Most competitors rely on imperfect content blockers, surveillance screenshots, or shame-driven streaks. Signal addresses the gap they miss: the sequence usually starts before the browser, and the 10-minute window between cue and action is where a simple interruption has the most leverage.
 
 • No fake blocker promises
 • No default accountability partners
