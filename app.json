@@ -4,7 +4,7 @@
     "name": "Signal",
     "slug": "signal",
     "scheme": "signal",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -16,6 +16,7 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": false,
+      "appleTeamId": "WYNT52D6DX",
       "bundleIdentifier": "com.signal.reset",
       "appStoreUrl": "https://apps.apple.com/us/app/signal-urge-reset/id6776899029",
       "infoPlist": {
