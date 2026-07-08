@@ -21,10 +21,10 @@ export function AppLockGate({ children }: { children: React.ReactNode }) {
   const authenticate = React.useCallback(async () => {
     setAuthing(true);
     try {
-      const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      const enrolled = await LocalAuthentication.isEnrolledAsync();
-      // If the device cannot do biometrics/passcode, don't trap the user out.
-      if (!hasHardware || !enrolled) {
+      const enrolledLevel = await LocalAuthentication.getEnrolledLevelAsync();
+      // If the device cannot authenticate with biometrics or passcode, don't
+      // trap the user out after enabling App Lock on an unsupported device.
+      if (enrolledLevel === LocalAuthentication.SecurityLevel.NONE) {
         setUnlockedState(true);
         return;
       }
@@ -32,6 +32,7 @@ export function AppLockGate({ children }: { children: React.ReactNode }) {
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: "Unlock Signal",
         cancelLabel: "Cancel",
+        fallbackLabel: "Use Passcode",
       });
       if (result.success) setUnlockedState(true);
     } catch {

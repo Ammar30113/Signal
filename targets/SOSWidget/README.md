@@ -15,11 +15,11 @@ A one-tap iOS Home Screen widget that opens Signal straight to the **SOS** scree
 
 ## Build & test (requires a dev build — widgets do NOT run in Expo Go)
 
-1. **Add your Apple Team ID** to `app.json` (prebuild warns until you do; the extension can't be signed without it):
+1. **Keep the Apple Team ID** in `app.json` (prebuild warns without it; the extension can't be signed without it):
    ```json
-   { "expo": { "ios": { "appleTeamId": "XXXXXXXXXX" } } }
+   { "expo": { "ios": { "appleTeamId": "WYNT52D6DX" } } }
    ```
-   Find it in Xcode → Settings → Accounts, or at https://developer.apple.com/account (Membership).
+   This is the team currently used by the EAS distribution certificate and provisioning profiles.
 2. Generate native code and run:
    ```bash
    npx expo run:ios        # regenerates ios/, installs pods, builds, launches

@@ -72,21 +72,29 @@ To enable Pro (v1.1):
 
 ---
 
+## Current Release Status
+
+As of July 8, 2026:
+
+- iOS `1.0.2` build `13` was uploaded to App Store Connect from EAS build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d`.
+- The uploaded binary maps to commit `fb1ba2d`.
+- App Store Connect processing/review remains the live release gate; repo-local and EAS build gates are green.
+
 ## Pre-Submission Checklist
 
 ### Legal & Compliance
 - [x] Privacy Policy — production-grade at `docs/privacy-policy.md`
 - [x] Terms of Service — at `docs/terms-of-service.md`
 - [x] EULA — at `docs/eula.md`
-- [ ] Host privacy policy at `https://signal-liart-rho.vercel.app/privacy` (must return unauthenticated 200)
-- [ ] Host terms of service at `https://signal-liart-rho.vercel.app/terms` (must return unauthenticated 200)
-- [ ] Host support page at `https://signal-liart-rho.vercel.app/support` (must return unauthenticated 200)
+- [x] Host privacy policy at `https://signal-liart-rho.vercel.app/privacy` (returns unauthenticated 200)
+- [x] Host terms of service at `https://signal-liart-rho.vercel.app/terms` (returns unauthenticated 200)
+- [x] Host support page at `https://signal-liart-rho.vercel.app/support` (returns unauthenticated 200)
 - [x] `ITSAppUsesNonExemptEncryption: false` set in `app.json`
 - [x] Face ID usage description set in `app.json`
 - [x] Age rating: 18+ (Frequent/Intense for Mature Themes and Sexual Content)
 
 ### App Store Connect Setup
-- [ ] Create app record in App Store Connect
+- [x] Create app record in App Store Connect
 - [ ] Set Primary Category: Health & Fitness
 - [ ] Set Secondary Category: Lifestyle
 - [ ] Upload promotional text (see `docs/app-store-metadata.md`)
@@ -120,8 +128,11 @@ To enable Pro (v1.1):
 ### Testing
 - [x] TypeScript: `npm run typecheck` passes with 0 errors
 - [x] Logic tests: `npm run test:logic` passes
-- [ ] Build: `npx eas build --platform ios --profile preview` succeeds
-- [ ] TestFlight: Install and test on physical device
+- [x] Expo doctor: `npm exec -- expo-doctor` passes
+- [x] Expo dependency validation: `npm exec -- expo install --check` passes
+- [x] Bundle sanity: `npm exec -- expo export --platform ios` and `npm exec -- expo export --platform web` pass
+- [x] Build: EAS iOS production build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d` succeeded
+- [ ] TestFlight: Install and test build `1.0.2 (13)` on physical device after Apple processing
 - [ ] App Lock: Enable → background → return → biometric prompt appears
 - [ ] Onboarding: Clear data → relaunch → onboarding appears
 - [ ] SOS Timer: Verify timer resumes accurately after app background / foreground
@@ -132,10 +143,10 @@ To enable Pro (v1.1):
 - [ ] Settings links: Privacy Policy, Terms, and Support all open correctly
 
 ### Post-Submission
-- [ ] Monitor App Review status
+- [ ] Monitor App Store Connect processing and App Review status for `1.0.2 (13)`
 - [ ] Respond to any App Review rejection feedback within 24 hours
-- [ ] Prepare v1.0.1 patch release for any post-launch issues
-- [ ] Set up Crashlytics or equivalent crash reporting for production monitoring
+- [ ] Prepare v1.0.3 patch release only if App Review or device QA finds an issue
+- [ ] Decide whether to keep the no-crash-SDK privacy posture or add privacy-preserving crash reporting in a later release
 
 ---
 
