@@ -78,6 +78,7 @@ As of July 8, 2026:
 
 - iOS `1.0.2` build `13` was uploaded to App Store Connect from EAS build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d`.
 - The uploaded binary maps to commit `fb1ba2d`.
+- A production EAS Update for runtime `1.0.2` was published from commit `2bb0762` as update group `c7a07b26-fc60-4ce1-9f7b-b72b1f0ac9a1`.
 - App Store Connect processing/review remains the live release gate; repo-local and EAS build gates are green.
 
 ## Pre-Submission Checklist
