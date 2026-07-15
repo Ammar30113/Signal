@@ -1,7 +1,8 @@
 # Signal
-Private Expo iOS MVP for Signal, a dark-mode behavioral control system for urge awareness, interruption, and redirection.
 
-Signal is positioned as a private 10-minute urge interruption system, not a porn blocker, surveillance tool, or shame-based streak app.
+Private, local-first iOS app for urge awareness, interruption, and redirection — **live on the App Store**: [Signal: Urge Reset](https://apps.apple.com/us/app/signal-urge-reset/id6776899029) (v1.0.2, free, 18+).
+
+Signal is positioned as a private 10-minute urge interruption system, not a porn blocker, surveillance tool, or shame-based streak app. Marketing/legal pages are hosted at https://signal-liart-rho.vercel.app (deployed from `site/` via Vercel).
 
 ## Run on Android with Expo Go
 
@@ -32,16 +33,17 @@ Then open Expo Go on Android and scan the QR code. Keep the terminal running whi
 - Trust rule: never monetize panic. Panic tools stay free permanently. Monetize insight, personalization, and long-term structure only.
 - Privacy rule: personal behavior data stays local by default. No screenshots, no surveillance, no default accountability partner.
 
-## Building for the stores
+## Shipping updates
 
-Expo Go is for development only and cannot run real store builds, App Lock biometrics, or IAP. To ship:
+Expo Go is for development only and cannot run real store builds, App Lock biometrics, the SOS widget, or IAP.
 
-```bash
-npx eas init        # creates the EAS project id (writes extra.eas.projectId)
-npx eas build -p ios
-npx eas build -p android
-```
+- **JS / asset / copy changes** (same native runtime): `eas update --channel production --message "…"`
+- **Native, config, widget, or SDK changes**: bump `version` in `app.json`, then
+  ```bash
+  npx eas build -p ios --profile production
+  npx eas submit -p ios --profile production
+  ```
 
-Before submitting: set `PRIVACY_POLICY_URL` and `SUPPORT_EMAIL` in `constants/links.ts`, host `docs/privacy-policy.md`, and set the App Store/Play age rating to 18+.
+Run `npm run typecheck` and `npm run test:logic` before either path.
 
-See [docs/production-readiness.md](docs/production-readiness.md) for launch and competitor-gap notes.
+See [docs/production-readiness.md](docs/production-readiness.md) for release status, the on-device regression checklist, and the v1.1 Pro playbook.

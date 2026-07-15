@@ -56,7 +56,6 @@ interface SignalContextValue {
   refreshEntitlement: () => Promise<void>;
   exportLocalData: () => string;
   clearLocalData: () => void;
-  resetMockSession: () => void;
 }
 
 const SignalContext = React.createContext<SignalContextValue | null>(null);
@@ -404,7 +403,6 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       refreshEntitlement,
       exportLocalData,
       clearLocalData,
-      resetMockSession: clearLocalData,
     }),
     [
       checkIns,

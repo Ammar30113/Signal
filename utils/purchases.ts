@@ -54,6 +54,7 @@ export async function getProOffering(): Promise<PurchasesOffering | null> {
 }
 
 export async function purchasePackage(pkg: PurchasesPackage): Promise<EntitlementPlan> {
+  await configurePurchases();
   const Purchases = await getSdk();
   const { customerInfo } = await Purchases.purchasePackage(pkg);
   return planFromCustomerInfo(customerInfo);

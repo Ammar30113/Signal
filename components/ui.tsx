@@ -262,6 +262,10 @@ export function Chip({
   return (
     <Pressable
       onPress={onPress}
+      // Chips render ~33pt tall; expand the touch area to ~44pt without
+      // changing the visual size. Wrap/Row gaps are 10, so ±5 never overlaps
+      // a neighboring chip's slop.
+      hitSlop={{ top: 5, bottom: 5, left: 4, right: 4 }}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ selected: !!selected }}

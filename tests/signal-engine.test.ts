@@ -1,6 +1,13 @@
 import { initialSnapshot } from "@/data/signal-data";
 import type { CheckInAnswer, CheckInEntry, InterventionSession, PauseSession, SlipReview } from "@/types/signal";
-import { buildPatternAggregate, buildWeeklyReview, classifyCheckIn, deriveSnapshot } from "@/utils/signal-engine";
+import {
+  buildPatternAggregate,
+  buildWeeklyReview,
+  classifyCheckIn,
+  deriveSnapshot,
+  getStateFromScore,
+  getTrend,
+} from "@/utils/signal-engine";
 
 function assertEqual<T>(actual: T, expected: T, message?: string) {
   if (actual !== expected) {
@@ -13,6 +20,20 @@ function assertOk<T>(value: T, message?: string): asserts value is NonNullable<T
     throw new Error(message ?? "Expected value to be present");
   }
 }
+
+// State thresholds: green < 36 <= yellow < 72 <= red.
+assertEqual(getStateFromScore(0), "green");
+assertEqual(getStateFromScore(35), "green");
+assertEqual(getStateFromScore(36), "yellow");
+assertEqual(getStateFromScore(71), "yellow");
+assertEqual(getStateFromScore(72), "red");
+assertEqual(getStateFromScore(100), "red");
+
+// Trend flips only on a move of 8+ points in either direction.
+assertEqual(getTrend(50, 57), "stable");
+assertEqual(getTrend(50, 58), "rising");
+assertEqual(getTrend(50, 43), "stable");
+assertEqual(getTrend(50, 42), "falling");
 
 const baseAnswer: CheckInAnswer = {
   mood: "Clear",

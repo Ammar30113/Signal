@@ -4,7 +4,7 @@ import { ActivityIndicator, Alert, Linking, View } from "react-native";
 import type { PurchasesOffering, PurchasesPackage } from "react-native-purchases";
 
 import { AppText, Button, Card, Header, Row, Screen, SectionTitle } from "@/components/ui";
-import { PRIVACY_POLICY_URL } from "@/constants/links";
+import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from "@/constants/links";
 import { MANAGE_SUBSCRIPTION_URL, isProBillingEnabled } from "@/constants/revenuecat";
 import { theme } from "@/constants/theme";
 import { useSignal } from "@/context/signal-store";
@@ -119,7 +119,7 @@ export default function PaywallScreen() {
               onPress={() => void handlePurchase(pkg)}
             />
           ))}
-          <Button label="Restore purchases" tone="ghost" onPress={() => void handleRestore()} />
+          <Button label="Restore purchases" tone="ghost" disabled={busyPackage !== null} onPress={() => void handleRestore()} />
         </Card>
       ) : (
         <Card>
@@ -132,7 +132,14 @@ export default function PaywallScreen() {
         <AppText style={{ color: theme.colors.muted, fontSize: 13 }}>
           Subscriptions renew automatically until cancelled. Manage or cancel anytime in your App Store or Google Play account.
         </AppText>
-        <Button label="Privacy policy" tone="ghost" onPress={() => void Linking.openURL(PRIVACY_POLICY_URL).catch(() => undefined)} />
+        <Row style={{ alignItems: "stretch" }}>
+          <View style={{ flex: 1 }}>
+            <Button label="Terms of use" tone="ghost" onPress={() => void Linking.openURL(TERMS_OF_SERVICE_URL).catch(() => undefined)} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button label="Privacy policy" tone="ghost" onPress={() => void Linking.openURL(PRIVACY_POLICY_URL).catch(() => undefined)} />
+          </View>
+        </Row>
       </Card>
     </Screen>
   );

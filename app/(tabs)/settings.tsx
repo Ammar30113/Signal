@@ -312,6 +312,7 @@ export default function SettingsScreen() {
         <Button label="Privacy policy" tone="secondary" onPress={handlePrivacyPolicy} />
         <Button label="Terms of service" tone="secondary" onPress={handleTermsOfService} />
         <Button label="Contact support" tone="ghost" onPress={handleSupport} />
+        <Button label="Our story" tone="ghost" onPress={() => router.push("/about")} />
       </Card>
 
       <Card accentColor={theme.colors.gold}>

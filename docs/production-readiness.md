@@ -31,7 +31,7 @@ Signal Pro:
 Target pricing:
 
 - Monthly: `$4.99`
-- Annual: `$39.99`
+- Annual: `$34.99`
 - Trial: 7 days
 
 ## Billing Notes
@@ -74,12 +74,12 @@ To enable Pro (v1.1):
 
 ## Current Release Status
 
-As of July 8, 2026:
+As of July 15, 2026: **Signal is LIVE on the App Store.**
 
-- iOS `1.0.2` build `13` was uploaded to App Store Connect from EAS build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d`.
-- The uploaded binary maps to commit `fb1ba2d`.
+- Live listing verified at https://apps.apple.com/us/app/signal-urge-reset/id6776899029 — v1.0.2, Free, 18+, Health & Fitness, released ~July 9, 2026.
+- iOS `1.0.2` build `13` came from EAS build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d` (commit `fb1ba2d`).
 - A production EAS Update for runtime `1.0.2` was published from commit `2bb0762` as update group `c7a07b26-fc60-4ce1-9f7b-b72b1f0ac9a1`.
-- App Store Connect processing/review remains the live release gate; repo-local and EAS build gates are green.
+- Ship path for JS/copy fixes: `eas update --channel production`. Native or config changes require a new build + submission (v1.0.3+).
 
 ## Pre-Submission Checklist
 
@@ -94,20 +94,20 @@ As of July 8, 2026:
 - [x] Face ID usage description set in `app.json`
 - [x] Age rating: 18+ (Frequent/Intense for Mature Themes and Sexual Content)
 
-### App Store Connect Setup
+### App Store Connect Setup — complete (app approved and live)
 - [x] Create app record in App Store Connect
-- [ ] Set Primary Category: Health & Fitness
-- [ ] Set Secondary Category: Lifestyle
-- [ ] Upload promotional text (see `docs/app-store-metadata.md`)
-- [ ] Upload description (see `docs/app-store-metadata.md`)
-- [ ] Upload keywords (see `docs/app-store-metadata.md`)
-- [ ] Upload app icon (1024×1024 — EAS handles this from `assets/icon.png`)
-- [ ] Upload screenshots for iPhone 6.9" and 6.7"
-- [ ] Fill out App Privacy section — select "Data Not Collected"
-- [ ] Fill out Content Rights — "Does not contain third-party content"
-- [ ] Fill out age rating questionnaire
-- [ ] Add App Review notes (see `docs/app-store-metadata.md`)
-- [ ] Set pricing: Free
+- [x] Set Primary Category: Health & Fitness (verified on live listing)
+- [x] Set Secondary Category: Lifestyle
+- [x] Upload promotional text (see `docs/app-store-metadata.md`)
+- [x] Upload description (see `docs/app-store-metadata.md`)
+- [x] Upload keywords (see `docs/app-store-metadata.md`)
+- [x] Upload app icon (1024×1024 — EAS handles this from `assets/icon.png`)
+- [x] Upload screenshots for iPhone 6.9" and 6.7"
+- [x] Fill out App Privacy section — "Data Not Collected"
+- [x] Fill out Content Rights — "Does not contain third-party content"
+- [x] Fill out age rating questionnaire (18+ verified on live listing)
+- [x] Add App Review notes (see `docs/app-store-metadata.md`)
+- [x] Set pricing: Free (verified on live listing)
 
 ### App Configuration
 - [x] `constants/links.ts` — production URLs and support email
@@ -133,20 +133,28 @@ As of July 8, 2026:
 - [x] Expo dependency validation: `npm exec -- expo install --check` passes
 - [x] Bundle sanity: `npm exec -- expo export --platform ios` and `npm exec -- expo export --platform web` pass
 - [x] Build: EAS iOS production build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d` succeeded
-- [ ] TestFlight: Install and test build `1.0.2 (13)` on physical device after Apple processing
+
+### On-device regression pass (post-launch, still owed)
+
+The app shipped without this checklist being recorded as done. Run it on a
+physical device with the production build and check items off — it doubles as
+the regression script for every future release.
+
 - [ ] App Lock: Enable → background → return → biometric prompt appears
 - [ ] Onboarding: Clear data → relaunch → onboarding appears
 - [ ] SOS Timer: Verify timer resumes accurately after app background / foreground
 - [ ] Check-in: Complete full flow → results appear on dashboard and pattern map
 - [ ] Slip Review: Complete flow → appears in pattern map
+- [ ] Pause: Complete flow → count appears on dashboard and pattern map
+- [ ] SOS Widget: Add to Home Screen → tap → opens SOS screen
 - [ ] Data Export: Export → verify JSON contains all logged data
 - [ ] Data Delete: Delete → confirm all data cleared, onboarding reappears
-- [ ] Settings links: Privacy Policy, Terms, and Support all open correctly
+- [ ] Settings links: Privacy Policy, Terms, Support, and Our story all open correctly
 
-### Post-Submission
-- [ ] Monitor App Store Connect processing and App Review status for `1.0.2 (13)`
-- [ ] Respond to any App Review rejection feedback within 24 hours
-- [ ] Prepare v1.0.3 patch release only if App Review or device QA finds an issue
+### Post-Launch
+- [x] App approved — live on the App Store as of ~July 9, 2026
+- [ ] Monitor App Store reviews and support inbox (supportsignalteam@gmail.com) weekly
+- [ ] Prepare v1.0.3 patch release only if device QA or user reports find an issue
 - [ ] Decide whether to keep the no-crash-SDK privacy posture or add privacy-preserving crash reporting in a later release
 
 ---
