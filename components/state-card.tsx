@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { Animated, View } from "react-native";
 
 import { stateTheme, theme } from "@/constants/theme";
 import { Button, Card, Row, AppText } from "@/components/ui";
@@ -15,6 +15,18 @@ export function StateCard({
   onCheckIn: () => void;
 }) {
   const stateCopy = stateTheme[state];
+
+  // Crossfade the zone block when the state flips (green/yellow/red) so the
+  // change registers without a jarring hard swap. Fades stay acceptable under
+  // Reduce Motion, so no gating is needed here.
+  const fade = React.useRef(new Animated.Value(1)).current;
+  const previousState = React.useRef(state);
+  React.useEffect(() => {
+    if (previousState.current === state) return;
+    previousState.current = state;
+    fade.setValue(0);
+    Animated.timing(fade, { toValue: 1, duration: 450, useNativeDriver: true }).start();
+  }, [fade, state]);
 
   return (
     <Card accentColor={stateCopy.accent} style={{ gap: 18 }}>
@@ -40,10 +52,11 @@ export function StateCard({
           Current state
         </AppText>
       </Row>
-      <View
+      <Animated.View
         accessible
         accessibilityRole="summary"
         accessibilityLabel={`Current state: ${stateCopy.label} zone. ${stateCopy.copy}. ${stateCopy.note}`}
+        style={{ opacity: fade }}
       >
         <Row style={{ alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
           <AppText
@@ -78,7 +91,7 @@ export function StateCard({
             {stateCopy.note}
           </AppText>
         </View>
-      </View>
+      </Animated.View>
       <View style={{ gap: 10 }}>
         <Button label="Emergency" tone="danger" onPress={onEmergency} />
         <Button label="Check in" tone="ghost" onPress={onCheckIn} />

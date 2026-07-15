@@ -1,7 +1,8 @@
 import Constants from "expo-constants";
+import { File, Paths } from "expo-file-system";
 import { router } from "expo-router";
 import React from "react";
-import { Alert, Linking, Share, Switch, TextInput, View, type TextInputProps } from "react-native";
+import { Alert, Linking, Platform, Share, Switch, TextInput, View, type TextInputProps } from "react-native";
 
 import { AppText, Button, Card, Chip, Header, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
 import { PRIVACY_POLICY_URL, SUPPORT_EMAIL, SUPPORT_URL, TERMS_OF_SERVICE_URL } from "@/constants/links";
@@ -173,10 +174,29 @@ export default function SettingsScreen() {
       Alert.alert("Nothing to export yet", "Log a check-in, pause, SOS session, slip review, or custom redirect first.");
       return;
     }
+
+    const json = exportLocalData();
+
+    // On iOS, share a real .json file (long histories truncate as inline text
+    // in some share targets). The file lives in the cache directory, which the
+    // OS purges — nothing lingers beyond the share.
+    if (Platform.OS === "ios") {
+      try {
+        const file = new File(Paths.cache, `signal-export-${new Date().toISOString().slice(0, 10)}.json`);
+        if (file.exists) file.delete();
+        file.create();
+        file.write(json);
+        await Share.share({ url: file.uri, title: "Signal local export" });
+        return;
+      } catch {
+        // Fall through to the inline-text share below.
+      }
+    }
+
     try {
       await Share.share({
         title: "Signal local export",
-        message: exportLocalData(),
+        message: json,
       });
     } catch {
       Alert.alert("Export failed", "Could not open the share sheet. Please try again.");

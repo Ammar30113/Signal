@@ -30,22 +30,48 @@ private let signalBackground = Color(red: 0.031, green: 0.035, blue: 0.051)
 private let signalRed = Color(red: 0.957, green: 0.247, blue: 0.294)
 
 struct SOSWidgetView: View {
+  @Environment(\.widgetFamily) private var family
+
   var body: some View {
-    VStack(spacing: 6) {
-      Text("SIGNAL")
-        .font(.caption2)
-        .fontWeight(.bold)
-        .foregroundStyle(.white.opacity(0.6))
-      Text("SOS")
-        .font(.system(size: 34, weight: .heavy))
-        .foregroundStyle(signalRed)
-      Text("Tap to interrupt the urge")
-        .font(.caption2)
-        .foregroundStyle(.white.opacity(0.6))
-        .multilineTextAlignment(.center)
+    switch family {
+    case .accessoryCircular:
+      // Lock Screen circle: the system renders it vibrant/monochrome.
+      ZStack {
+        AccessoryWidgetBackground()
+        Text("SOS")
+          .font(.system(size: 15, weight: .heavy))
+      }
+    case .accessoryRectangular:
+      VStack(alignment: .leading, spacing: 1) {
+        Text("SIGNAL")
+          .font(.caption2)
+          .fontWeight(.bold)
+          .opacity(0.7)
+        Text("SOS")
+          .font(.headline)
+          .fontWeight(.heavy)
+        Text("Interrupt the urge")
+          .font(.caption2)
+          .opacity(0.7)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+    default:
+      VStack(spacing: 6) {
+        Text("SIGNAL")
+          .font(.caption2)
+          .fontWeight(.bold)
+          .foregroundStyle(.white.opacity(0.6))
+        Text("SOS")
+          .font(.system(size: 34, weight: .heavy))
+          .foregroundStyle(signalRed)
+        Text("Tap to interrupt the urge")
+          .font(.caption2)
+          .foregroundStyle(.white.opacity(0.6))
+          .multilineTextAlignment(.center)
+      }
+      .padding()
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    .padding()
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 }
 
@@ -56,11 +82,15 @@ struct SOSWidget: Widget {
     StaticConfiguration(kind: kind, provider: SOSProvider()) { _ in
       SOSWidgetView()
         .widgetURL(URL(string: "signal:///sos"))
-        .containerBackground(for: .widget) { signalBackground }
+        .containerBackground(for: .widget) {
+          // Lock Screen accessories get system vibrancy; the brand background
+          // only applies to the Home Screen widget.
+          signalBackground
+        }
     }
     .configurationDisplayName("Signal SOS")
     .description("One tap to open the 10-minute interruption.")
-    .supportedFamilies([.systemSmall])
+    .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular])
   }
 }
 

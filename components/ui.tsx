@@ -1,5 +1,8 @@
 import React from "react";
 import {
+  AccessibilityInfo,
+  Animated,
+  Easing,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,6 +18,71 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { theme } from "@/constants/theme";
+
+export function useReducedMotion() {
+  const [reduced, setReduced] = React.useState(false);
+
+  React.useEffect(() => {
+    let mounted = true;
+    void AccessibilityInfo.isReduceMotionEnabled()
+      .then((value) => {
+        if (mounted) setReduced(value);
+      })
+      .catch(() => undefined);
+    const sub = AccessibilityInfo.addEventListener("reduceMotionChanged", setReduced);
+    return () => {
+      mounted = false;
+      sub.remove();
+    };
+  }, []);
+
+  return reduced;
+}
+
+// Slow breathing-pace pulse (~4.4s cycle) for running timers. Sits at rest
+// when inactive or when the user has Reduce Motion enabled.
+export function Breathe({ active, children }: { active: boolean; children: React.ReactNode }) {
+  const reducedMotion = useReducedMotion();
+  const phase = React.useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    if (!active || reducedMotion) {
+      phase.stopAnimation();
+      Animated.timing(phase, { toValue: 0, duration: 300, useNativeDriver: true }).start();
+      return undefined;
+    }
+
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(phase, {
+          toValue: 1,
+          duration: 2200,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(phase, {
+          toValue: 0,
+          duration: 2200,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [active, phase, reducedMotion]);
+
+  return (
+    <Animated.View
+      style={{
+        opacity: phase.interpolate({ inputRange: [0, 1], outputRange: [1, 0.82] }),
+        transform: [{ scale: phase.interpolate({ inputRange: [0, 1], outputRange: [1, 1.015] }) }],
+      }}
+    >
+      {children}
+    </Animated.View>
+  );
+}
 
 export function AppText({ style, ...props }: TextProps) {
   return (
@@ -203,7 +271,7 @@ export function Button({
         style,
       ]}
     >
-      <AppText style={{ color: palette.color, fontWeight: "800", fontSize: 16 }}>{label}</AppText>
+      <AppText selectable={false} style={{ color: palette.color, fontWeight: "800", fontSize: 16 }}>{label}</AppText>
     </Pressable>
   );
 }
@@ -225,6 +293,7 @@ export function Chip({
 }) {
   const content = (
     <AppText
+      selectable={false}
       style={[
         {
           color: selected ? "#151008" : theme.colors.textSoft,

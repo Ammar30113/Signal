@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import React from "react";
 import { View } from "react-native";
 
@@ -46,6 +46,32 @@ export default function CheckInScreen() {
   const [exposedToContent, setExposedToContent] = React.useState(false);
   const [bargainingThoughts, setBargainingThoughts] = React.useState(false);
   const [result, setResult] = React.useState<CheckInResult | null>(null);
+
+  // A shown classification describes the answers it was computed from — clear
+  // it as soon as any answer changes so a stale verdict never sits next to
+  // edited inputs. (No-op on mount and after submit, when nothing changed.)
+  React.useEffect(() => {
+    setResult(null);
+  }, [mood, intensity, trigger, emotionalDriver, hasScrolled, exposedToContent, bargainingThoughts]);
+
+  // Tab screens stay mounted, so the snapshot-seeded fields can go stale after
+  // an SOS session or dashboard slider change. On focus, re-seed intensity and
+  // trigger from the latest snapshot — but only fields still at their last
+  // seeded value, and never while a result is on screen.
+  const seededRef = React.useRef({ intensity: snapshot.intensity, trigger: snapshot.topTrigger });
+  useFocusEffect(
+    React.useCallback(() => {
+      if (result) return;
+      if (intensity === seededRef.current.intensity && intensity !== snapshot.intensity) {
+        seededRef.current.intensity = snapshot.intensity;
+        setIntensity(snapshot.intensity);
+      }
+      if (trigger === seededRef.current.trigger && trigger !== snapshot.topTrigger) {
+        seededRef.current.trigger = snapshot.topTrigger;
+        setTrigger(snapshot.topTrigger);
+      }
+    }, [intensity, result, snapshot.intensity, snapshot.topTrigger, trigger]),
+  );
 
   const handleSubmit = () => {
     const next = submitCheckIn({

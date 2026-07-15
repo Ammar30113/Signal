@@ -5,7 +5,7 @@ import React from "react";
 import { AppState, TextInput, View } from "react-native";
 
 import { IntensitySlider } from "@/components/intensity-slider";
-import { AppText, Button, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
+import { AppText, Breathe, Button, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
 import { theme } from "@/constants/theme";
 import { emergencyActions, moods, triggers } from "@/data/signal-data";
 import { useSignal } from "@/context/signal-store";
@@ -140,17 +140,19 @@ export default function SosScreen() {
 
       <Card accentColor={theme.colors.red} style={{ backgroundColor: "#161014" }}>
         <SectionTitle title="Intervention timer" detail={`Action selected: ${selectedAction}`} />
-        <AppText
-          style={{
-            color: theme.colors.white,
-            fontSize: 72,
-            lineHeight: 76,
-            fontWeight: "900",
-            fontVariant: ["tabular-nums"],
-          }}
-        >
-          {formatTime(remaining)}
-        </AppText>
+        <Breathe active={running}>
+          <AppText
+            style={{
+              color: theme.colors.white,
+              fontSize: 72,
+              lineHeight: 76,
+              fontWeight: "900",
+              fontVariant: ["tabular-nums"],
+            }}
+          >
+            {formatTime(remaining)}
+          </AppText>
+        </Breathe>
         <ProgressBar value={progress} color={theme.colors.red} />
         <Row>
           <Chip label="5 min" selected={duration === 300} onPress={() => setProtocolDuration(300)} />

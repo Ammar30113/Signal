@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import React from "react";
 import { AppState, Pressable, View } from "react-native";
 
-import { AppText, Button, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle } from "@/components/ui";
+import { AppText, Breathe, Button, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle } from "@/components/ui";
 import { theme } from "@/constants/theme";
 import { useSignal } from "@/context/signal-store";
 import type { RedirectAction } from "@/types/signal";
@@ -168,17 +168,19 @@ export default function PauseScreen() {
           title="Pause timer"
           detail={arrived ? "The wait is done. Move into your action." : "Stay with it. The urge spikes, then fades on its own."}
         />
-        <AppText
-          style={{
-            color: theme.colors.white,
-            fontSize: 64,
-            lineHeight: 68,
-            fontWeight: "900",
-            fontVariant: ["tabular-nums"],
-          }}
-        >
-          {formatTime(remaining)}
-        </AppText>
+        <Breathe active={running}>
+          <AppText
+            style={{
+              color: theme.colors.white,
+              fontSize: 64,
+              lineHeight: 68,
+              fontWeight: "900",
+              fontVariant: ["tabular-nums"],
+            }}
+          >
+            {formatTime(remaining)}
+          </AppText>
+        </Breathe>
         <ProgressBar value={progress} color={theme.colors.gold} />
         <Row>
           {durationOptions.map((seconds) => (

@@ -1,9 +1,12 @@
 import { Redirect, Tabs } from "expo-router";
-import { Text, View } from "react-native";
+import { SymbolView, type SFSymbol } from "expo-symbols";
+import { Text, View, type ColorValue } from "react-native";
 
 import { theme } from "@/constants/theme";
 import { useSignal } from "@/context/signal-store";
 
+// Letter fallback for platforms where the symbol can't render (e.g. Expo Go on
+// Android). iOS — the shipped platform — gets real SF Symbols below.
 function TabMark({
   label,
   focused,
@@ -41,6 +44,32 @@ function TabMark({
   );
 }
 
+function TabIcon({
+  symbol,
+  focusedSymbol,
+  fallbackLabel,
+  focused,
+  color,
+  danger,
+}: {
+  symbol: SFSymbol;
+  focusedSymbol?: SFSymbol;
+  fallbackLabel: string;
+  focused: boolean;
+  color: ColorValue;
+  danger?: boolean;
+}) {
+  return (
+    <SymbolView
+      name={focused ? (focusedSymbol ?? symbol) : symbol}
+      size={25}
+      tintColor={color}
+      weight={focused ? "semibold" : "regular"}
+      fallback={<TabMark label={fallbackLabel} focused={focused} danger={danger} />}
+    />
+  );
+}
+
 export default function TabLayout() {
   const { settings } = useSignal();
 
@@ -70,28 +99,42 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Dashboard",
-          tabBarIcon: ({ focused }) => <TabMark label="D" focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon symbol="waveform.path.ecg" fallbackLabel="D" focused={focused} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="check-in"
         options={{
           title: "Check-In",
-          tabBarIcon: ({ focused }) => <TabMark label="C" focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon symbol="checklist" fallbackLabel="C" focused={focused} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="pattern"
         options={{
           title: "Pattern",
-          tabBarIcon: ({ focused }) => <TabMark label="P" focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon symbol="chart.xyaxis.line" fallbackLabel="P" focused={focused} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="identity"
         options={{
           title: "Identity",
-          tabBarIcon: ({ focused }) => <TabMark label="I" focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon
+              symbol="person.crop.circle"
+              focusedSymbol="person.crop.circle.fill"
+              fallbackLabel="I"
+              focused={focused}
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -99,14 +142,31 @@ export default function TabLayout() {
         options={{
           title: "SOS",
           tabBarActiveTintColor: theme.colors.red,
-          tabBarIcon: ({ focused }) => <TabMark label="!" focused={focused} danger />,
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon
+              symbol="exclamationmark.triangle"
+              focusedSymbol="exclamationmark.triangle.fill"
+              fallbackLabel="!"
+              focused={focused}
+              color={color}
+              danger
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: "Privacy",
-          tabBarIcon: ({ focused }) => <TabMark label="S" focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon
+              symbol="lock.shield"
+              focusedSymbol="lock.shield.fill"
+              fallbackLabel="S"
+              focused={focused}
+              color={color}
+            />
+          ),
         }}
       />
     </Tabs>

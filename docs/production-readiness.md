@@ -157,6 +157,33 @@ the regression script for every future release.
 - [ ] Prepare v1.0.3 patch release only if device QA or user reports find an issue
 - [ ] Decide whether to keep the no-crash-SDK privacy posture or add privacy-preserving crash reporting in a later release
 
+### July 15, 2026 improvement pass — how to ship it
+
+**OTA-eligible (publish to `preview`, QA, then `production`).** Everything here
+is JS/asset-only against native modules already compiled into the 1.0.2 binary
+(`expo-symbols` and `expo-file-system` ship inside the build via expo-router /
+expo — verified against the lockfile at commit `fb1ba2d`):
+
+- SF Symbol tab icons (letter-circle fallback kept for Expo Go Android)
+- Breathing pulse on running SOS/Pause timers (respects Reduce Motion) and a
+  crossfade on dashboard state changes
+- Check-in: stale classification clears when inputs change; slider/trigger
+  re-seed from the latest snapshot on tab focus
+- iOS data export now shares a real `.json` file from the cache directory
+- Paywall: Terms of use link (Apple requires Terms + Privacy on subscription
+  paywalls), Restore disabled mid-purchase, purchase configures the SDK first
+- "Our story" reachable from Settings; chip tap targets widened to ~44pt
+
+**Requires a native build + store submission (v1.0.3):**
+
+- Lock Screen SOS widget (`accessoryCircular` / `accessoryRectangular`
+  families in `targets/SOSWidget/SOSWidget.swift`) — typechecked against the
+  iOS 17 SDK with `swiftc -typecheck -parse-as-library`; compiles for real on
+  the next EAS build
+
+**Site (deploys on push via Vercel):** App Store download CTA, favicon,
+meta/OG tags.
+
 ---
 
 ## App Review Tips
