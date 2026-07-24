@@ -16,10 +16,17 @@ import type {
   SlipReview,
   UserSettings,
 } from "@/types/signal";
-import { buildPatternAggregate, classifyCheckIn, deriveSnapshot, getStateFromScore, getTrend } from "@/utils/signal-engine";
+import {
+  buildPatternAggregate,
+  classifyCheckIn,
+  countStructuredDays,
+  deriveSnapshot,
+  getStateFromScore,
+  getTrend,
+} from "@/utils/signal-engine";
 import { isProBillingEnabled } from "@/constants/revenuecat";
 import { addPlanListener, getCurrentPlan } from "@/utils/purchases";
-import { scheduleHighRiskReminders } from "@/utils/notifications";
+import { cancelHighRiskReminders, scheduleHighRiskReminders } from "@/utils/notifications";
 import { maybeRequestStoreReview } from "@/utils/review-prompt";
 import {
   clearSignalState,
@@ -186,9 +193,23 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
   // Keep high-risk reminders aligned with the latest danger windows. Pro + opt-in
   // only; utils/notifications dynamically imports expo-notifications, so a free
   // user who never enables this never loads the native module.
+  const remindersScheduledRef = React.useRef(false);
   const dangerWindowKey = patternAggregate.dangerWindows.map((window) => window.label).join("|");
   React.useEffect(() => {
-    if (!isHydrated || entitlement.plan !== "pro" || !settings.highRiskRemindersEnabled) return;
+    if (!isHydrated) return;
+
+    // Withdrawing the entitlement or clearing local data has to take the already
+    // scheduled notifications with it — the OS keeps firing them otherwise, long
+    // after the app has forgotten why. Gated on the ref so a user who never
+    // scheduled anything still never loads the native module.
+    if (entitlement.plan !== "pro" || !settings.highRiskRemindersEnabled) {
+      if (!remindersScheduledRef.current) return;
+      remindersScheduledRef.current = false;
+      void cancelHighRiskReminders().catch(() => undefined);
+      return;
+    }
+
+    remindersScheduledRef.current = true;
     const windows = patternAggregate.dangerWindows.map((window) => window.label);
     void scheduleHighRiskReminders(windows).catch(() => undefined);
     // patternAggregate is read via dangerWindowKey so we only reschedule when the
@@ -235,12 +256,13 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
         },
         checkIns: [entry, ...checkIns],
         interventions,
+        pauses,
         slipReviews,
       }),
     );
 
     return result;
-  }, [checkIns, interventions, slipReviews]);
+  }, [checkIns, interventions, pauses, slipReviews]);
 
   const completeIntervention = React.useCallback(
     (session: Omit<InterventionSession, "id" | "createdAt" | "completedAt" | "completed">) => {
@@ -260,6 +282,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
           current,
           checkIns,
           interventions: nextInterventions,
+          pauses,
           slipReviews,
         }),
       );
@@ -284,11 +307,18 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       notifySelection();
       const nextPauses = [saved, ...pauses];
       setPauses((current) => [saved, ...current]);
+      // The one snapshot field a pause does move: showing up on a day counts,
+      // whichever tool you reached for. Everything else stays as the last
+      // check-in / SOS / slip left it.
+      setSnapshot((current) => ({
+        ...current,
+        progressDays: countStructuredDays({ checkIns, interventions, pauses: nextPauses, slipReviews }),
+      }));
       maybePromptForReview({ interventions, pauses: nextPauses, slipReviews });
 
       return saved;
     },
-    [interventions, maybePromptForReview, pauses, slipReviews],
+    [checkIns, interventions, maybePromptForReview, pauses, slipReviews],
   );
 
   const saveSlipReview = React.useCallback((review: Omit<SlipReview, "id" | "createdAt">) => {
@@ -304,13 +334,14 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
         current,
         checkIns,
         interventions,
+        pauses,
         slipReviews: [saved, ...slipReviews],
       }),
     );
     notifySelection();
 
     return saved;
-  }, [checkIns, interventions, slipReviews]);
+  }, [checkIns, interventions, pauses, slipReviews]);
 
   const addCustomRedirect = React.useCallback((input: RedirectActionInput) => {
     const title = input.title.trim().slice(0, 56);

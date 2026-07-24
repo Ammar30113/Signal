@@ -74,12 +74,37 @@ To enable Pro (v1.1):
 
 ## Current Release Status
 
-As of July 15, 2026: **Signal is LIVE on the App Store.**
+**Live on the App Store: v1.0.2. Working tree: v1.0.3, unreleased.**
 
 - Live listing verified at https://apps.apple.com/us/app/signal-urge-reset/id6776899029 — v1.0.2, Free, 18+, Health & Fitness, released ~July 9, 2026.
 - iOS `1.0.2` build `13` came from EAS build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d` (commit `fb1ba2d`).
 - A production EAS Update for runtime `1.0.2` was published from commit `2bb0762` as update group `c7a07b26-fc60-4ce1-9f7b-b72b1f0ac9a1`.
-- Ship path for JS/copy fixes: `eas update --channel production`. Native or config changes require a new build + submission (v1.0.3+).
+
+### 1.0.3 is a build, not an OTA
+
+`app.json` moved to `1.0.3` on July 24, 2026, which — under the `appVersion`
+runtime policy — moves `runtimeVersion` with it. **Nothing in this tree can
+reach live 1.0.2 users over the air**, and that is deliberate: two changes here
+are native and would break under an OTA that pretended otherwise.
+
+- Lock Screen SOS widget families (`accessoryCircular` / `accessoryRectangular`
+  in `targets/SOSWidget/SOSWidget.swift`) — Swift, compiled into the binary.
+- Ten Expo SDK 56 native modules realigned to the versions the SDK expects
+  (`expo-router`, `expo-updates`, `react-native-screens`, and others). The JS in
+  this tree is built against that newer native code.
+
+Because the runtimes no longer match, an accidental `eas update --channel
+production` is now a no-op for 1.0.2 users rather than a mismatched bundle.
+
+Ship path for 1.0.3:
+
+```bash
+npx eas build -p ios --profile production
+npx eas submit -p ios --profile production
+```
+
+Once 1.0.3 is live, `eas update --channel production` resumes as the path for
+JS/asset/copy-only fixes on top of it.
 
 ## Pre-Submission Checklist
 
@@ -129,8 +154,14 @@ As of July 15, 2026: **Signal is LIVE on the App Store.**
 ### Testing
 - [x] TypeScript: `npm run typecheck` passes with 0 errors
 - [x] Logic tests: `npm run test:logic` passes
-- [x] Expo doctor: `npm exec -- expo-doctor` passes
+- [x] Expo doctor: `npm exec -- expo-doctor` passes (21/21)
 - [x] Expo dependency validation: `npm exec -- expo install --check` passes
+
+`.github/workflows/ci.yml` runs typecheck, the logic tests, and
+`expo install --check` on every push to `main` and every PR. That last check
+exits non-zero the moment a dependency drifts from the version SDK 56 expects,
+so treat a red CI on an untouched branch as "run `npx expo install --fix`", not
+as a flake.
 - [x] Bundle sanity: `npm exec -- expo export --platform ios` and `npm exec -- expo export --platform web` pass
 - [x] Build: EAS iOS production build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d` succeeded
 
@@ -153,33 +184,52 @@ the regression script for every future release.
 
 ### Post-Launch
 - [x] App approved — live on the App Store as of ~July 9, 2026
+- [x] v1.0.3 prepared — see "What 1.0.3 contains" above
+- [ ] Build and submit v1.0.3 (`eas build` → `eas submit`, both `-p ios --profile production`)
+- [ ] Run the on-device regression pass above against the 1.0.3 build before submitting
 - [ ] Monitor App Store reviews and support inbox (supportsignalteam@gmail.com) weekly
-- [ ] Prepare v1.0.3 patch release only if device QA or user reports find an issue
 - [ ] Decide whether to keep the no-crash-SDK privacy posture or add privacy-preserving crash reporting in a later release
 
-### July 15, 2026 improvement pass — how to ship it
+### What 1.0.3 contains
 
-**OTA-eligible (publish to `preview`, QA, then `production`).** Everything here
-is JS/asset-only against native modules already compiled into the 1.0.2 binary
-(`expo-symbols` and `expo-file-system` ship inside the build via expo-router /
-expo — verified against the lockfile at commit `fb1ba2d`):
+All of the following ships in the 1.0.3 binary. The JS-only items below were
+drafted as OTA candidates against runtime 1.0.2; the native changes in the same
+tree overtook that, so they now go out with the build.
+
+**UI and flow (JS):**
 
 - SF Symbol tab icons (letter-circle fallback kept for Expo Go Android)
 - Breathing pulse on running SOS/Pause timers (respects Reduce Motion) and a
   crossfade on dashboard state changes
 - Check-in: stale classification clears when inputs change; slider/trigger
   re-seed from the latest snapshot on tab focus
-- iOS data export now shares a real `.json` file from the cache directory
+- iOS data export shares a real `.json` file from the cache directory
 - Paywall: Terms of use link (Apple requires Terms + Privacy on subscription
   paywalls), Restore disabled mid-purchase, purchase configures the SDK first
 - "Our story" reachable from Settings; chip tap targets widened to ~44pt
 
-**Requires a native build + store submission (v1.0.3):**
+**Correctness fixes (July 24, 2026 inspection):**
+
+- SOS no longer carries a saved protocol's reflection and intensity readings
+  into the next session. The tab never unmounts, so restarting after a save left
+  the old answers in the form already valid to submit — a second tap logged that
+  session twice in the pattern map.
+- Pauses now count toward `progressDays`. A day interrupted only by a pause was
+  previously worth zero "days structured" even though pauses count everywhere
+  else in the app. A pause still never re-classifies the urge state.
+- High-risk reminders are cancelled when the Pro entitlement lapses or local
+  data is deleted. Previously the scheduled daily notifications survived both,
+  so the OS kept firing them after the app had dropped the setting — which also
+  broke the promise that "Delete local data" clears the device.
+
+**Native:**
 
 - Lock Screen SOS widget (`accessoryCircular` / `accessoryRectangular`
   families in `targets/SOSWidget/SOSWidget.swift`) — typechecked against the
   iOS 17 SDK with `swiftc -typecheck -parse-as-library`; compiles for real on
   the next EAS build
+- Expo SDK 56 dependency realignment (10 packages) so `expo install --check`
+  and `expo-doctor` pass again — this is what CI enforces
 
 **Site (deploys on push via Vercel):** App Store download CTA, favicon,
 meta/OG tags.

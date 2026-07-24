@@ -289,26 +289,49 @@ export function buildWeeklyReview({
   };
 }
 
+/**
+ * Distinct calendar days on which at least one interruption was logged — a
+ * check-in, pause, SOS protocol, or slip review. Days, not events: ten check-ins
+ * in one day still count once. A pause is a real interruption, so it earns the
+ * day even though it never re-classifies the urge state.
+ */
+export function countStructuredDays({
+  checkIns,
+  interventions,
+  pauses = [],
+  slipReviews,
+}: {
+  checkIns: CheckInEntry[];
+  interventions: InterventionSession[];
+  pauses?: PauseSession[];
+  slipReviews: SlipReview[];
+}): number {
+  return new Set(
+    [...checkIns, ...interventions, ...pauses, ...slipReviews].map((entry) => entry.createdAt.slice(0, 10)),
+  ).size;
+}
+
 export function deriveSnapshot({
   current,
   checkIns,
   interventions,
+  pauses = [],
   slipReviews,
 }: {
   current: SignalSnapshot;
   checkIns: CheckInEntry[];
   interventions: InterventionSession[];
+  pauses?: PauseSession[];
   slipReviews: SlipReview[];
 }): SignalSnapshot {
   const lastCheckIn = checkIns[0];
   const lastIntervention = interventions[0];
   const lastSlip = slipReviews[0];
-  const aggregate = buildPatternAggregate({ checkIns, interventions, slipReviews });
-  const structuredDays = new Set(
-    [...checkIns, ...interventions, ...slipReviews].map((entry) => entry.createdAt.slice(0, 10)),
-  ).size;
+  const aggregate = buildPatternAggregate({ checkIns, interventions, pauses, slipReviews });
+  const structuredDays = countStructuredDays({ checkIns, interventions, pauses, slipReviews });
 
-  // Drive the live snapshot from whichever event happened most recently.
+  // Drive the live snapshot from whichever event happened most recently. Pauses
+  // are excluded on purpose — a micro-pause is a nudge, not a re-classification.
   const events = [
     lastIntervention?.completed ? { kind: "intervention" as const, at: lastIntervention.createdAt } : null,
     lastCheckIn ? { kind: "checkin" as const, at: lastCheckIn.createdAt } : null,

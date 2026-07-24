@@ -104,7 +104,19 @@ export default function SosScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running]);
 
+  // The SOS tab never unmounts, so a saved protocol's answers stay on screen
+  // until the next session starts. Clear them at that point — otherwise the
+  // previous reflection and intensity readings sit in the form already valid to
+  // save, and a second tap logs that same session again in the pattern map.
+  const clearSavedAnswers = () => {
+    if (!saved) return;
+    setReflection("");
+    setIntensityBefore(snapshot.intensity);
+    setIntensityAfter(Math.max(0, snapshot.intensity - 18));
+  };
+
   const setProtocolDuration = (seconds: number) => {
+    clearSavedAnswers();
     sessionActiveRef.current = false;
     setRunning(false);
     setRemaining(seconds);
@@ -165,6 +177,7 @@ export default function SosScreen() {
               tone="danger"
               onPress={() => {
                 if (remaining === 0) {
+                  clearSavedAnswers();
                   endAtRef.current = null;
                   setRemaining(duration);
                   setReflectionReady(false);

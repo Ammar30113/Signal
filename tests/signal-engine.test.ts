@@ -4,6 +4,7 @@ import {
   buildPatternAggregate,
   buildWeeklyReview,
   classifyCheckIn,
+  countStructuredDays,
   deriveSnapshot,
   getStateFromScore,
   getTrend,
@@ -198,5 +199,46 @@ const interventionDriven = deriveSnapshot({
 });
 
 assertEqual(interventionDriven.trend, "falling");
+
+// Structured days count distinct calendar days, not events. The check-in and
+// intervention share 2026-06-04; the slip review and pause share 2026-06-05.
+assertEqual(
+  countStructuredDays({ checkIns: [checkIn], interventions: [intervention], pauses: [pause], slipReviews: [slipReview] }),
+  2,
+);
+
+// Ten check-ins in one day is still one day.
+assertEqual(
+  countStructuredDays({
+    checkIns: [checkIn, { ...checkIn, id: "check-in-test-2", createdAt: "2026-06-04T08:00:00.000Z" }],
+    interventions: [],
+    slipReviews: [],
+  }),
+  1,
+);
+
+// A day interrupted only by a pause still counts as structured — a pause is a
+// real interruption even though it never re-classifies the urge state.
+const pauseOnlyDay: PauseSession = { ...pause, id: "pause-test-2", createdAt: "2026-06-09T14:00:00.000Z" };
+const withPauseDay = deriveSnapshot({
+  current: initialSnapshot,
+  checkIns: [checkIn],
+  interventions: [intervention],
+  pauses: [pauseOnlyDay, pause],
+  slipReviews: [slipReview],
+});
+const withoutPauseDay = deriveSnapshot({
+  current: initialSnapshot,
+  checkIns: [checkIn],
+  interventions: [intervention],
+  slipReviews: [slipReview],
+});
+
+assertEqual(withPauseDay.progressDays, 3);
+assertEqual(withoutPauseDay.progressDays, 2);
+// ...but the pause must not take over the snapshot: the slip review is still the
+// most recent classifying event, so it keeps driving state and trigger.
+assertEqual(withPauseDay.currentState, withoutPauseDay.currentState);
+assertEqual(withPauseDay.topTrigger, withoutPauseDay.topTrigger);
 
 console.log("signal-engine tests passed");
