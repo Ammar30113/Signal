@@ -156,14 +156,27 @@ JS/asset/copy-only fixes on top of it.
 - [x] Logic tests: `npm run test:logic` passes
 - [x] Expo doctor: `npm exec -- expo-doctor` passes (21/21)
 - [x] Expo dependency validation: `npm exec -- expo install --check` passes
-
-`.github/workflows/ci.yml` runs typecheck, the logic tests, and
-`expo install --check` on every push to `main` and every PR. That last check
-exits non-zero the moment a dependency drifts from the version SDK 56 expects,
-so treat a red CI on an untouched branch as "run `npx expo install --fix`", not
-as a flake.
 - [x] Bundle sanity: `npm exec -- expo export --platform ios` and `npm exec -- expo export --platform web` pass
 - [x] Build: EAS iOS production build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d` succeeded
+- [x] CI green on `main` (run `30762571611`, Aug 2, 2026)
+
+#### CI notes
+
+`.github/workflows/ci.yml` runs `npm ci`, typecheck, the logic tests, and
+`expo install --check` on every push to `main` and every PR.
+
+Two things about it are worth knowing before you change it:
+
+- **`node-version` must stay on a major that bundles npm 11** (24 does). The
+  lockfile is authored by npm 11 locally; npm 10 refuses to install it and
+  `npm ci` fails with `Missing: react-native-worklets@0.8.3 from lock file`.
+  This broke every run between July 24 and Aug 2, 2026. Regenerating the lock
+  under npm 10 makes it satisfy both, but the next local `npm install` undoes
+  that, so the toolchain alignment is the fix — not the lockfile.
+- **`expo install --check` can go red without a commit.** It compares against
+  the newest SDK-56-compatible patch on the registry, so the day Expo publishes
+  one, an untouched branch fails. Treat that as "run `npx expo install --fix`",
+  not as a flake. (It caught `expo@56.0.18` / `expo-router@56.2.17` this way.)
 
 ### On-device regression pass (post-launch, still owed)
 
