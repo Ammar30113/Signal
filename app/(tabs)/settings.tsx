@@ -9,7 +9,8 @@ import { PRIVACY_POLICY_URL, SUPPORT_EMAIL, SUPPORT_URL, TERMS_OF_SERVICE_URL } 
 import { isProBillingEnabled } from "@/constants/revenuecat";
 import { theme } from "@/constants/theme";
 import { useSignal } from "@/context/signal-store";
-import { cancelHighRiskReminders, ensureNotificationPermission } from "@/utils/notifications";
+import { cancelHighRiskReminders, cancelWeeklyDigest, ensureNotificationPermission } from "@/utils/notifications";
+import { parseSignalImport, summaryTotal } from "@/utils/signal-import";
 
 function SettingRow({
   title,
@@ -100,7 +101,9 @@ export default function SettingsScreen() {
     setLocalEntitlement,
     patternAggregate,
     exportLocalData,
+    importLocalData,
     clearLocalData,
+    persistenceFailed,
     checkIns,
     interventions,
     pauses,
@@ -169,6 +172,23 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleToggleDigest = async (next: boolean) => {
+    if (next) {
+      const allowed = await ensureNotificationPermission();
+      if (!allowed) {
+        Alert.alert(
+          "Notifications are off",
+          "Turn on notifications for Signal in your device settings to receive the weekly digest.",
+        );
+        return;
+      }
+      updateSettings({ weeklyDigestEnabled: true });
+    } else {
+      updateSettings({ weeklyDigestEnabled: false });
+      void cancelWeeklyDigest().catch(() => undefined);
+    }
+  };
+
   const handleExport = async () => {
     if (checkIns.length + interventions.length + pauses.length + slipReviews.length + customRedirects.length === 0) {
       Alert.alert("Nothing to export yet", "Log a check-in, pause, SOS session, slip review, or custom redirect first.");
@@ -201,6 +221,76 @@ export default function SettingsScreen() {
     } catch {
       Alert.alert("Export failed", "Could not open the share sheet. Please try again.");
     }
+  };
+
+  const hasLocalHistory =
+    checkIns.length + interventions.length + pauses.length + slipReviews.length + customRedirects.length > 0;
+
+  const runImport = (parsed: ReturnType<typeof parseSignalImport>, mode: "merge" | "replace") => {
+    if (!parsed) return;
+    const summary = importLocalData(parsed, mode);
+    const added = summaryTotal(summary);
+    const skippedNote = summary.skipped > 0 ? `\n\n${summary.skipped} entr${summary.skipped === 1 ? "y was" : "ies were"} skipped because they could not be read.` : "";
+
+    Alert.alert(
+      mode === "merge" ? "Import complete" : "Data replaced",
+      `${added} entr${added === 1 ? "y" : "ies"} restored: ${summary.checkIns} check-ins, ` +
+        `${summary.interventions} protocols, ${summary.pauses} pauses, ${summary.slipReviews} reviews, ` +
+        `${summary.customRedirects} custom redirects.${skippedNote}`,
+    );
+  };
+
+  const handleImport = async () => {
+    if (Platform.OS === "web") {
+      Alert.alert("Not available here", "Importing a Signal export is only supported in the mobile app.");
+      return;
+    }
+
+    let raw: string;
+    try {
+      const picked = await File.pickFileAsync({ mimeTypes: ["application/json", "text/plain", "*/*"] });
+      if (picked.canceled) return;
+      raw = await picked.result.text();
+    } catch {
+      Alert.alert("Could not open that file", "Pick the .json file Signal created when you exported your data.");
+      return;
+    }
+
+    const parsed = parseSignalImport(raw);
+    if (!parsed) {
+      Alert.alert("That isn't a Signal export", "Choose the .json file Signal created from Export local data.");
+      return;
+    }
+
+    const found =
+      parsed.checkIns.length + parsed.interventions.length + parsed.pauses.length + parsed.slipReviews.length + parsed.customRedirects.length;
+
+    if (found === 0) {
+      Alert.alert(
+        "Nothing to import",
+        parsed.skipped > 0
+          ? "Every entry in that file was unreadable, so there is nothing to restore."
+          : "That export does not contain any check-ins, pauses, protocols, or reviews.",
+      );
+      return;
+    }
+
+    // With nothing on this device there is no decision to make — restoring onto
+    // a fresh install is the whole point, so skip straight to it.
+    if (!hasLocalHistory) {
+      runImport(parsed, "replace");
+      return;
+    }
+
+    Alert.alert(
+      "Import Signal data",
+      `Found ${found} entr${found === 1 ? "y" : "ies"}. Merge keeps what is already on this device and adds anything new. Replace discards your current history first.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Merge", onPress: () => runImport(parsed, "merge") },
+        { text: "Replace", style: "destructive", onPress: () => runImport(parsed, "replace") },
+      ],
+    );
   };
 
   const handleClear = () => {
@@ -241,6 +331,18 @@ export default function SettingsScreen() {
         detail="Local-first. No account. No screenshots. No accountability partner unless you explicitly choose that later."
       />
 
+      {persistenceFailed ? (
+        <Card accentColor={theme.colors.red}>
+          <SectionTitle title="Signal could not save to this device" />
+          <AppText style={{ color: theme.colors.textSoft }}>
+            Your most recent entries are still on screen but were not written to storage, so they will be lost if you
+            close Signal. This usually means the device is out of space. Free some space, then export your data to be
+            safe.
+          </AppText>
+          <Button label="Export local data" tone="primary" onPress={handleExport} />
+        </Card>
+      ) : null}
+
       <Card>
         <SectionTitle title="Privacy posture" />
         <SettingRow
@@ -275,6 +377,11 @@ export default function SettingsScreen() {
           </View>
         </Row>
         <Button label="Export local data" tone="secondary" onPress={handleExport} />
+        <Button label="Import from a Signal export" tone="secondary" onPress={() => void handleImport()} />
+        <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>
+          Signal has no account, so an export is the only way your history moves to a new phone. Keep the file somewhere
+          you trust — it contains everything you have logged.
+        </AppText>
         <Button label="Delete local data" tone="ghost" onPress={handleClear} />
       </Card>
 
@@ -337,13 +444,13 @@ export default function SettingsScreen() {
 
       <Card accentColor={theme.colors.gold}>
         <SectionTitle
-          title="High-risk reminders"
-          detail="A gentle, local nudge during the windows you tend to be most vulnerable — learned only from your own history on this device."
+          title="When Signal reaches out"
+          detail="Local notifications only — scheduled on this device, from your own history. Nothing is sent anywhere."
         />
         {entitlement.plan === "pro" ? (
           <>
             <SettingRow
-              title="Daily reminders"
+              title="High-risk reminders"
               detail="Notifies you around your top danger windows so you can check in or pause early."
               value={settings.highRiskRemindersEnabled}
               onChange={handleToggleReminders}
@@ -353,11 +460,18 @@ export default function SettingsScreen() {
                 Reminders start once your pattern map has enough check-ins to find your high-risk windows.
               </AppText>
             ) : null}
+            <SettingRow
+              title="Weekly digest"
+              detail="One quiet nudge on Sunday evening to review the week's pattern before the next one starts."
+              value={settings.weeklyDigestEnabled}
+              onChange={handleToggleDigest}
+            />
           </>
         ) : (
           <Row style={{ justifyContent: "space-between", alignItems: "center", gap: 16 }}>
             <AppText style={{ flex: 1, color: theme.colors.textSoft, fontSize: 13 }}>
-              Arrives with Signal Pro. Panic tools stay free forever — this is an optional extra, never a paywalled crisis tool.
+              High-risk reminders and the weekly digest arrive with Signal Pro. Panic tools stay free forever — these are
+              optional extras, never a paywalled crisis tool.
             </AppText>
             <Chip label="Pro" selected />
           </Row>

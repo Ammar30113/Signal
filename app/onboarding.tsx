@@ -131,6 +131,15 @@ export default function OnboardingScreen() {
         </View>
       </Card>
 
+      <Card>
+        <SectionTitle title="Where this came from" detail="Signal is a system that worked, turned into an app." />
+        <AppText style={{ color: theme.colors.textSoft, fontSize: 16, lineHeight: 24 }}>
+          It started with a 10-minute timer, a notebook of triggers, and no shame. Eventually the urges stopped coming —
+          the goal is an app that makes itself unnecessary.
+        </AppText>
+        <Button label="Read the story" tone="ghost" onPress={() => router.push("/about")} />
+      </Card>
+
       <Card accentColor={theme.colors.gold}>
         <SectionTitle title="Ready?" detail="Start with the protocol, or go to the dashboard and use it when the signal appears." />
         <Button label="Open my protocol" tone="primary" onPress={handleOpenProtocol} />

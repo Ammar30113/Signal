@@ -1,5 +1,7 @@
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 import React from "react";
+import { AppState } from "react-native";
 
 import { redirectActions } from "@/data/signal-data";
 import type {
@@ -7,11 +9,13 @@ import type {
   CheckInEntry,
   CheckInResult,
   Entitlement,
+  ImportSummary,
   InterventionSession,
   PauseSession,
   PatternAggregate,
   RedirectAction,
   RedirectActionInput,
+  SignalPersistedState,
   SignalSnapshot,
   SlipReview,
   UserSettings,
@@ -26,8 +30,20 @@ import {
 } from "@/utils/signal-engine";
 import { isProBillingEnabled } from "@/constants/revenuecat";
 import { addPlanListener, getCurrentPlan } from "@/utils/purchases";
-import { cancelHighRiskReminders, scheduleHighRiskReminders } from "@/utils/notifications";
+import {
+  DIGEST_ROUTE,
+  addNotificationRouteListener,
+  cancelHighRiskReminders,
+  cancelWeeklyDigest,
+  scheduleHighRiskReminders,
+  scheduleWeeklyDigest,
+} from "@/utils/notifications";
 import { maybeRequestStoreReview } from "@/utils/review-prompt";
+import {
+  mergeSignalImport,
+  replaceWithImport,
+  type ParsedImport,
+} from "@/utils/signal-import";
 import {
   clearSignalState,
   createSignalExport,
@@ -36,8 +52,21 @@ import {
   defaultSettings,
   loadSignalState,
   saveSignalState,
-  type SignalPersistedState,
 } from "@/utils/storage";
+
+/**
+ * Ask for an App Store review at widening milestones of completed interruptions
+ * rather than once per install. iOS silently caps the sheet at three times a
+ * year and never tells us whether it actually appeared, so a single lifetime
+ * attempt quietly throws the rating away when the system swallows it.
+ */
+const REVIEW_PROMPT_MILESTONES = [5, 20, 50];
+const REVIEW_PROMPT_MIN_GAP_MS = 14 * 24 * 60 * 60 * 1000;
+
+// The dashboard slider writes a new snapshot on every release. Coalesce that
+// churn instead of re-serializing the whole history each time; anything that
+// touches real history still writes immediately (see the save effect).
+const SNAPSHOT_SAVE_DEBOUNCE_MS = 400;
 
 interface SignalContextValue {
   snapshot: SignalSnapshot;
@@ -51,6 +80,8 @@ interface SignalContextValue {
   entitlement: Entitlement;
   patternAggregate: PatternAggregate;
   isHydrated: boolean;
+  /** True when the last write to device storage failed. Surfaced in Settings. */
+  persistenceFailed: boolean;
   updateIntensity: (intensity: number) => void;
   submitCheckIn: (answer: CheckInAnswer) => CheckInResult;
   completeIntervention: (session: Omit<InterventionSession, "id" | "createdAt" | "completedAt" | "completed">) => InterventionSession;
@@ -62,6 +93,7 @@ interface SignalContextValue {
   setLocalEntitlement: (plan: Entitlement["plan"]) => void;
   refreshEntitlement: () => Promise<void>;
   exportLocalData: () => string;
+  importLocalData: (parsed: ParsedImport, mode: "merge" | "replace") => ImportSummary;
   clearLocalData: () => void;
 }
 
@@ -86,6 +118,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = React.useState<UserSettings>(defaultSettings);
   const [entitlement, setEntitlement] = React.useState<Entitlement>(defaultEntitlement);
   const [isHydrated, setIsHydrated] = React.useState(false);
+  const [persistenceFailed, setPersistenceFailed] = React.useState(false);
   const reviewPromptPendingRef = React.useRef(false);
 
   React.useEffect(() => {
@@ -101,10 +134,28 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     setIsHydrated(true);
   }, []);
 
-  React.useEffect(() => {
-    if (!isHydrated) return;
+  // Persistence. `pendingRef` always holds the newest state; `dirtyRef` says
+  // whether it still needs writing. Both a debounced timer and the AppState
+  // flush below go through `flushSave`, so a write is never lost or doubled.
+  const pendingRef = React.useRef<SignalPersistedState | null>(null);
+  const dirtyRef = React.useRef(false);
+  const saveTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedSliceRef = React.useRef<unknown[] | null>(null);
 
-    saveSignalState({
+  const flushSave = React.useCallback(() => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    if (!dirtyRef.current || !pendingRef.current) return;
+    dirtyRef.current = false;
+    setPersistenceFailed(!saveSignalState(pendingRef.current));
+  }, []);
+
+  React.useEffect(() => {
+    if (!isHydrated) return undefined;
+
+    pendingRef.current = {
       snapshot,
       checkIns,
       interventions,
@@ -113,8 +164,43 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       customRedirects,
       settings,
       entitlement,
+    };
+
+    // Everything except `snapshot` — history, settings, entitlement. These
+    // change rarely and matter, so they are written straight away. A snapshot-
+    // only change is the slider moving, which can wait.
+    const slice = [checkIns, interventions, pauses, slipReviews, customRedirects, settings, entitlement];
+    const previous = lastSavedSliceRef.current;
+    lastSavedSliceRef.current = slice;
+
+    // First pass after hydration: nothing has changed since load, so writing it
+    // straight back would just be a wasted serialize on every launch.
+    if (previous === null) return undefined;
+
+    dirtyRef.current = true;
+    if (slice.some((value, index) => value !== previous[index])) {
+      flushSave();
+      return undefined;
+    }
+
+    saveTimerRef.current = setTimeout(flushSave, SNAPSHOT_SAVE_DEBOUNCE_MS);
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    };
+  }, [checkIns, customRedirects, entitlement, flushSave, interventions, isHydrated, pauses, settings, slipReviews, snapshot]);
+
+  // A debounced write must not die with the app. Flush the moment we stop being
+  // foregrounded, and on teardown.
+  React.useEffect(() => {
+    const subscription = AppState.addEventListener("change", (next) => {
+      if (next !== "active") flushSave();
     });
-  }, [checkIns, customRedirects, entitlement, interventions, isHydrated, pauses, settings, slipReviews, snapshot]);
+    return () => {
+      subscription.remove();
+      flushSave();
+    };
+  }, [flushSave]);
 
   // Sync entitlement from RevenueCat — only when billing is configured.
   // With no API key this never runs, so the free build stays purely local.
@@ -169,25 +255,37 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       pauses: PauseSession[];
       slipReviews: SlipReview[];
     }) => {
-      if (!isHydrated || settings.lastReviewPromptedAt || reviewPromptPendingRef.current) return;
+      if (!isHydrated || reviewPromptPendingRef.current) return;
+
+      const attempts = settings.reviewPromptAttempts;
+      if (attempts >= REVIEW_PROMPT_MILESTONES.length) return;
 
       const meaningfulActions =
         nextInterventions.filter((session) => session.completed).length + nextPauses.length + nextSlipReviews.length;
-      if (meaningfulActions < 3) return;
+      if (meaningfulActions < REVIEW_PROMPT_MILESTONES[attempts]) return;
+
+      // Space the attempts out even for a heavy user who clears a milestone the
+      // same week — iOS would drop the extra sheet anyway, wasting an attempt.
+      if (settings.lastReviewPromptedAt) {
+        const elapsed = Date.now() - Date.parse(settings.lastReviewPromptedAt);
+        if (Number.isFinite(elapsed) && elapsed < REVIEW_PROMPT_MIN_GAP_MS) return;
+      }
 
       reviewPromptPendingRef.current = true;
       void maybeRequestStoreReview()
         .then((requested) => {
           if (!requested) return;
-          setSettings((current) =>
-            current.lastReviewPromptedAt ? current : { ...current, lastReviewPromptedAt: new Date().toISOString() },
-          );
+          setSettings((current) => ({
+            ...current,
+            reviewPromptAttempts: current.reviewPromptAttempts + 1,
+            lastReviewPromptedAt: new Date().toISOString(),
+          }));
         })
         .finally(() => {
           reviewPromptPendingRef.current = false;
         });
     },
-    [isHydrated, settings.lastReviewPromptedAt],
+    [isHydrated, settings.lastReviewPromptedAt, settings.reviewPromptAttempts],
   );
 
   // Keep high-risk reminders aligned with the latest danger windows. Pro + opt-in
@@ -216,6 +314,51 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     // windows themselves change, not on every unrelated aggregate recompute.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHydrated, entitlement.plan, settings.highRiskRemindersEnabled, dangerWindowKey]);
+
+  // Weekly digest, same lifecycle as the reminders above: Pro + opt-in, and
+  // cancelled on the way down so a lapsed plan stops the notification too.
+  const digestScheduledRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!isHydrated) return;
+
+    if (entitlement.plan !== "pro" || !settings.weeklyDigestEnabled) {
+      if (!digestScheduledRef.current) return;
+      digestScheduledRef.current = false;
+      void cancelWeeklyDigest().catch(() => undefined);
+      return;
+    }
+
+    digestScheduledRef.current = true;
+    void scheduleWeeklyDigest().catch(() => undefined);
+  }, [isHydrated, entitlement.plan, settings.weeklyDigestEnabled]);
+
+  // Route taps on our own notifications. Only attached while notifications are
+  // actually in use, so a free user still never loads expo-notifications.
+  const notificationsInUse =
+    entitlement.plan === "pro" && (settings.highRiskRemindersEnabled || settings.weeklyDigestEnabled);
+  React.useEffect(() => {
+    if (!isHydrated || !notificationsInUse) return undefined;
+
+    let active = true;
+    let dispose: (() => void) | undefined;
+
+    void addNotificationRouteListener((url) => {
+      // Mapped rather than passed through so the router keeps its literal
+      // route types and a malformed payload cannot navigate anywhere odd.
+      if (url === DIGEST_ROUTE) router.navigate("/pattern");
+      else router.navigate("/check-in");
+    })
+      .then((off) => {
+        if (active) dispose = off;
+        else off();
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+      dispose?.();
+    };
+  }, [isHydrated, notificationsInUse]);
 
   const updateIntensity = React.useCallback((intensity: number) => {
     setSnapshot((current) => {
@@ -396,6 +539,45 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     return createSignalExport(state);
   }, [checkIns, customRedirects, entitlement, interventions, pauses, settings, slipReviews, snapshot]);
 
+  const importLocalData = React.useCallback(
+    (parsed: ParsedImport, mode: "merge" | "replace") => {
+      const current: SignalPersistedState = {
+        snapshot,
+        checkIns,
+        interventions,
+        pauses,
+        slipReviews,
+        customRedirects,
+        settings,
+        entitlement,
+      };
+
+      const { state, summary } = mode === "merge" ? mergeSignalImport(current, parsed) : replaceWithImport(current, parsed);
+
+      setCheckIns(state.checkIns);
+      setInterventions(state.interventions);
+      setPauses(state.pauses);
+      setSlipReviews(state.slipReviews);
+      setCustomRedirects(state.customRedirects);
+      // Recompute rather than trusting the file's snapshot: it describes the
+      // device it was exported from, and after a merge it may not even be the
+      // most recent event any more.
+      setSnapshot(
+        deriveSnapshot({
+          current: state.snapshot,
+          checkIns: state.checkIns,
+          interventions: state.interventions,
+          pauses: state.pauses,
+          slipReviews: state.slipReviews,
+        }),
+      );
+      notifySelection();
+
+      return summary;
+    },
+    [checkIns, customRedirects, entitlement, interventions, pauses, settings, slipReviews, snapshot],
+  );
+
   const clearLocalData = React.useCallback(() => {
     clearSignalState();
     setSnapshot(defaultPersistedState.snapshot);
@@ -422,6 +604,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       entitlement,
       patternAggregate,
       isHydrated,
+      persistenceFailed,
       updateIntensity,
       submitCheckIn,
       completeIntervention,
@@ -433,6 +616,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       setLocalEntitlement,
       refreshEntitlement,
       exportLocalData,
+      importLocalData,
       clearLocalData,
     }),
     [
@@ -445,10 +629,12 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       deleteCustomRedirect,
       entitlement,
       exportLocalData,
+      importLocalData,
       interventions,
       isHydrated,
       patternAggregate,
       pauses,
+      persistenceFailed,
       refreshEntitlement,
       redirects,
       saveSlipReview,

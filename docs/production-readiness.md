@@ -19,14 +19,24 @@ Free forever:
 - Custom redirect protocols
 - Weekly review and basic pattern summary
 - App lock
-- Export/delete privacy controls
+- Export, **import**, and delete privacy controls
 
-Signal Pro:
+Signal Pro — "the part that comes to you":
 
-- High-risk reminders
-- Advanced trend comparisons and guided weekly planning
-- Expanded protocol templates and recovery playbooks
-- Future encrypted backup
+- High-risk reminders during your danger windows
+- Weekly digest notification
+
+That is the whole list, and `app/paywall.tsx` says exactly this and nothing
+more. The earlier draft advertised advanced trend comparisons, expanded
+protocol templates, and encrypted multi-device sync — none of which exist.
+Shipping that copy would have risked rejection under App Store Review 2.3
+(accurate metadata) and earned refunds from anyone who paid for it. **Do not
+re-add a bullet before the feature is in the build.**
+
+Note that encrypted backup / multi-device sync cannot be built without a
+server, which is in direct tension with the local-first promise. If it is ever
+wanted, the version that keeps the promise is an end-to-end encrypted export to
+the user's *own* iCloud — not a Signal-operated backend.
 
 Target pricing:
 
@@ -192,8 +202,14 @@ the regression script for every future release.
 - [ ] Pause: Complete flow → count appears on dashboard and pattern map
 - [ ] SOS Widget: Add to Home Screen → tap → opens SOS screen
 - [ ] Data Export: Export → verify JSON contains all logged data
+- [ ] Data Import: Export → Delete local data → Import → history restored
+- [ ] Data Import (merge): Import the same file twice → no duplicated entries
 - [ ] Data Delete: Delete → confirm all data cleared, onboarding reappears
 - [ ] Settings links: Privacy Policy, Terms, Support, and Our story all open correctly
+- [ ] Onboarding: "Read the story" opens About and returns cleanly
+- [ ] Notifications (Pro, simulate via the debug toggle): enable reminders and
+      the weekly digest, tap each notification → lands on Check-In / Pattern
+- [ ] Notifications: turn Pro off → confirm scheduled notifications stop
 
 ### Post-Launch
 - [x] App approved — live on the App Store as of ~July 9, 2026
@@ -220,6 +236,36 @@ tree overtook that, so they now go out with the build.
 - Paywall: Terms of use link (Apple requires Terms + Privacy on subscription
   paywalls), Restore disabled mid-purchase, purchase configures the SDK first
 - "Our story" reachable from Settings; chip tap targets widened to ~44pt
+
+**Growth, durability, and honesty pass (Aug 2, 2026):**
+
+- **Data import.** `Import from a Signal export` in Settings restores a `.json`
+  export, with Merge (union by id, so re-importing is a no-op) or Replace.
+  Signal has no account, so this was the only thing standing between a new
+  phone and total data loss. Settings and entitlement are deliberately *not*
+  taken from the file — a handed-around export cannot grant Pro or switch off
+  someone's App Lock. Parsing is defensive and covered by
+  `tests/signal-import.test.ts`.
+- **Review prompts now ask at milestones** (5 / 20 / 50 completed
+  interruptions, ≥14 days apart) instead of once per install at 3. iOS caps the
+  sheet at three per year and never reports whether it appeared, so the old
+  single lifetime attempt silently threw the rating away whenever the system
+  swallowed it. Installs that already prompted resume at the next milestone.
+- **Failed writes are surfaced.** `saveSignalState` returns a boolean and
+  Settings shows a red card when a write fails. It previously swallowed the
+  error, so a full device meant history vanished with no warning — the worst
+  possible failure for an app whose promise is "it's all on your device."
+- **Persistence is debounced.** The dashboard slider rewrote the entire history
+  on every release; at ~1,900 events that is a 646 KB synchronous serialize.
+  History and settings still write immediately, snapshot-only churn coalesces
+  at 400ms, and a flush on backgrounding means nothing is lost.
+- **Notification taps route** to check-in (reminders) or the pattern map
+  (digest) instead of dumping you wherever you were.
+- **Weekly digest** (Pro): one Sunday-evening nudge so the weekly review gets
+  read. Same lifecycle as reminders — cancelled when Pro lapses.
+- **Paywall lists only shipping features.** See "Free vs Pro" above.
+- **The origin story is reachable from onboarding**, not just three taps deep
+  in Settings. It is the most differentiated copy in the product.
 
 **Correctness fixes (July 24, 2026 inspection):**
 

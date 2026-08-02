@@ -10,11 +10,13 @@ import { theme } from "@/constants/theme";
 import { useSignal } from "@/context/signal-store";
 import { getProOffering, purchasePackage, restorePurchases } from "@/utils/purchases";
 
+// Only list what actually ships today. A paywall that promises features the
+// build does not contain is an App Store review risk and a refund magnet, and
+// it is the fastest way to lose the trust the rest of the product is built on.
+// When a new Pro feature lands, add it here — not before.
 const PRO_FEATURES = [
-  "Advanced trend comparisons and guided weekly planning",
-  "Expanded protocol templates and recovery playbooks",
-  "High-risk reminders for your danger windows",
-  "Encrypted backup and multi-device sync (coming soon)",
+  "High-risk reminders during the windows you tend to slip",
+  "A weekly digest so the pattern map actually gets read",
   "Support Signal's private, tracker-free development",
 ];
 
@@ -76,8 +78,8 @@ export default function PaywallScreen() {
     <Screen>
       <Header
         eyebrow="Signal Pro"
-        title="Go deeper."
-        detail="Panic tools stay free forever. Pro adds long-term insight, personalization, and structure."
+        title="Let Signal reach out."
+        detail="Every tool in the app stays free — the timers, check-ins, slip review, and pattern map. Pro is the part that comes to you."
       />
 
       <Card accentColor={theme.colors.gold}>

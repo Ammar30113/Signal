@@ -201,6 +201,13 @@ export interface UserSettings {
   protocolDurationSeconds: number;
   pauseDurationSeconds: number;
   highRiskRemindersEnabled: boolean;
+  weeklyDigestEnabled: boolean;
+  /**
+   * How many times the App Store review sheet has been requested. iOS silently
+   * caps prompts at 3 per year, so we ask at widening milestones rather than
+   * once per install — see REVIEW_PROMPT_MILESTONES.
+   */
+  reviewPromptAttempts: number;
   lastReviewPromptedAt?: string;
 }
 
@@ -209,4 +216,30 @@ export interface Entitlement {
   source: "local" | "revenuecat";
   lastCheckedAt?: string;
   expiresAt?: string;
+}
+
+/**
+ * Everything Signal keeps on the device. Lives here rather than in utils/storage
+ * so the pure import/merge logic can be tested without pulling in the SQLite
+ * localStorage shim, which cannot load outside the app runtime.
+ */
+export interface SignalPersistedState {
+  snapshot: SignalSnapshot;
+  checkIns: CheckInEntry[];
+  interventions: InterventionSession[];
+  pauses: PauseSession[];
+  slipReviews: SlipReview[];
+  customRedirects: RedirectAction[];
+  settings: UserSettings;
+  entitlement: Entitlement;
+}
+
+export interface ImportSummary {
+  checkIns: number;
+  interventions: number;
+  pauses: number;
+  slipReviews: number;
+  customRedirects: number;
+  /** Entries dropped because they did not survive validation. */
+  skipped: number;
 }
