@@ -9,10 +9,18 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          # Keep this on a Node major that bundles npm 11 — 24 (LTS) does.
+          # package-lock.json is authored by npm 11 locally, and npm 10 rejects
+          # what npm 11 writes: they disagree on whether a transitive
+          # devDependency (@expo/ui -> react-native-worklets) belongs in the
+          # lock, so `npm ci` fails on Node 22 with "Missing: ... from lock
+          # file". Hand-patching the lock to satisfy both does not hold — the
+          # next local `npm install` strips it again. Align the npm major here
+          # instead, and do not lower this without checking `npm ci` first.
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run typecheck
