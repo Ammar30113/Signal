@@ -12,59 +12,617 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://signal-liart-rho.vercel.app">
   <meta property="og:image" content="https://signal-liart-rho.vercel.app/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!--
+    The three phones below are HTML/CSS recreations of the real screens, built
+    from the app's own design tokens (constants/theme.ts) and its own copy —
+    not photographs. To swap in real App Store screenshots instead, replace the
+    contents of each <div class="screen"> with:
+        <img src="/shot-dashboard.png" alt="Signal dashboard" class="shot">
+    and drop the PNGs in site/. The .shot rule at the end of the stylesheet
+    already sizes them correctly.
+  -->
   <style>
-    :root { --bg: #08090D; --surface: #12141A; --text: #E8E6E3; --muted: #7A7D85; --gold: #C9A84C; --border: #1E2028; --green: #4CAF50; }
+    :root {
+      --bg: #08090D;
+      --bg-soft: #0D0F15;
+      --surface: #111219;
+      --surface-raised: #171922;
+      --surface-muted: #1E212B;
+      --border: #2B2E38;
+      --border-strong: #454957;
+      --text: #F5F4F0;
+      --text-soft: #C7C4BD;
+      --muted: #8A8D99;
+      --muted-dark: #5D606A;
+      --gold: #F5C24B;
+      --green: #73D48A;
+      --red: #F43F4B;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif; line-height: 1.7; }
-    .hero { text-align: center; padding: 80px 24px 60px; max-width: 600px; margin: 0 auto; }
-    h1 { font-size: 42px; font-weight: 900; letter-spacing: -1px; margin-bottom: 16px; }
-    h1 span { color: var(--gold); }
-    .tagline { font-size: 20px; color: var(--muted); margin-bottom: 40px; line-height: 1.5; }
-    .cards { display: flex; flex-direction: column; gap: 16px; max-width: 500px; margin: 0 auto 48px; padding: 0 24px; }
-    .card { background: var(--surface); border-radius: 16px; padding: 24px; border: 1px solid var(--border); }
-    .card h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
-    .card p { color: var(--muted); font-size: 15px; margin: 0; }
-    .links { text-align: center; padding: 40px 24px; border-top: 1px solid var(--border); }
-    .links a { color: var(--gold); text-decoration: none; margin: 0 16px; font-size: 15px; }
-    .links a:hover { text-decoration: underline; }
-    .badge { display: inline-block; background: var(--gold); color: var(--bg); font-weight: 800; font-size: 12px; padding: 4px 10px; border-radius: 6px; margin-bottom: 20px; letter-spacing: 1px; text-transform: uppercase; }
-    .cta { display: inline-block; background: var(--gold); color: var(--bg); font-weight: 800; font-size: 17px; padding: 14px 28px; border-radius: 12px; text-decoration: none; }
-    .cta:hover { filter: brightness(1.08); }
-    .cta-note { color: var(--muted); font-size: 13px; margin-top: 12px; }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation: none !important; transition: none !important; }
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Helvetica Neue', sans-serif;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+    .narrow { max-width: 660px; margin: 0 auto; }
+
+    section { padding: 92px 0; }
+    @media (max-width: 720px) { section { padding: 64px 0; } }
+
+    .eyebrow {
+      font-size: 12px; font-weight: 800; letter-spacing: 3.4px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: clamp(28px, 4.4vw, 40px); font-weight: 900;
+      letter-spacing: -0.8px; line-height: 1.15; margin-bottom: 20px;
+    }
+    h3 { font-size: 19px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.2px; }
+
+    p { color: var(--text-soft); font-size: 17px; margin-bottom: 18px; }
+    p.lede { font-size: 19px; line-height: 1.7; }
+    .dim { color: var(--muted); }
+
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ---------- hero ---------- */
+    .hero { padding: 84px 0 40px; text-align: center; position: relative; }
+    .hero::before {
+      content: ""; position: absolute; top: -180px; left: 50%;
+      transform: translateX(-50%); width: 720px; height: 520px;
+      background: radial-gradient(closest-side, rgba(245, 194, 75, 0.10), transparent 72%);
+      pointer-events: none; z-index: 0;
+    }
+    .hero > * { position: relative; z-index: 1; }
+
+    .badge {
+      display: inline-block; font-size: 11.5px; font-weight: 800;
+      letter-spacing: 1.4px; text-transform: uppercase;
+      color: var(--gold); border: 1px solid rgba(245, 194, 75, 0.32);
+      background: rgba(245, 194, 75, 0.07);
+      padding: 7px 14px; border-radius: 999px; margin-bottom: 26px;
+    }
+
+    h1 {
+      font-size: clamp(40px, 7.4vw, 68px); font-weight: 900;
+      letter-spacing: -2.2px; line-height: 1.03; margin-bottom: 20px;
+    }
+    h1 .accent { color: var(--gold); }
+
+    .tagline {
+      font-size: clamp(17px, 2.2vw, 20px); color: var(--text-soft);
+      max-width: 560px; margin: 0 auto 34px; line-height: 1.6;
+    }
+
+    .cta {
+      display: inline-block; background: var(--gold); color: #171104;
+      font-weight: 800; font-size: 17px; padding: 15px 30px;
+      border-radius: 14px; border: 1px solid var(--gold);
+    }
+    .cta:hover { filter: brightness(1.08); text-decoration: none; }
+    .cta-note { color: var(--muted); font-size: 13.5px; margin-top: 14px; }
+
+    /* Small phones: the badge and headline both overrun 390px otherwise. */
+    @media (max-width: 440px) {
+      .wrap { padding: 0 18px; }
+      .badge { font-size: 9.5px; letter-spacing: 0.8px; padding: 6px 11px; }
+      h1 { font-size: 34px; letter-spacing: -1.3px; }
+      .tagline { font-size: 16.5px; }
+      .hero { padding-top: 60px; }
+      .pull { font-size: 18px; padding-left: 18px; }
+      .promise .big { font-size: 21px; }
+    }
+
+    /* ---------- phone mockups ---------- */
+    .phones {
+      display: flex; gap: 26px; justify-content: center;
+      align-items: flex-start; flex-wrap: wrap; margin-top: 56px;
+    }
+    .phone-wrap { max-width: 258px; }
+    .phone-cap {
+      text-align: center; font-size: 13.5px; color: var(--muted);
+      margin-top: 16px; line-height: 1.5;
+    }
+    .phone-cap b { color: var(--text-soft); display: block; font-weight: 700; }
+
+    .phone {
+      width: 258px; padding: 9px; border-radius: 42px;
+      background: linear-gradient(165deg, #23262F, #14161C);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 34px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    }
+    .screen {
+      position: relative; border-radius: 34px; overflow: hidden;
+      background: var(--bg); height: 524px; padding: 0 13px;
+      display: flex; flex-direction: column;
+    }
+    .island {
+      width: 74px; height: 20px; background: #000; border-radius: 999px;
+      margin: 9px auto 4px; flex: none;
+    }
+    .scr { flex: 1; overflow: hidden; font-size: 11px; }
+
+    /* in-screen primitives, mirroring the app's components */
+    .s-eyebrow {
+      font-size: 8px; font-weight: 800; letter-spacing: 2.2px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+    }
+    .s-title { font-size: 23px; font-weight: 800; letter-spacing: -0.6px; margin-bottom: 4px; }
+    .s-sub { font-size: 10px; color: var(--text-soft); line-height: 1.45; margin-bottom: 12px; }
+    .s-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 15px; padding: 11px; margin-bottom: 9px;
+    }
+    .s-card.gold { border-color: var(--gold); }
+    .s-card.red { border-color: var(--red); background: #161014; }
+    .s-card.green { border-color: var(--green); }
+    .s-label {
+      font-size: 7.5px; font-weight: 800; letter-spacing: 1.7px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
+    }
+    .s-row { display: flex; align-items: center; gap: 7px; }
+    .s-between { display: flex; justify-content: space-between; align-items: flex-start; gap: 7px; }
+    .s-btn {
+      flex: 1; text-align: center; font-size: 10px; font-weight: 800;
+      padding: 9px 6px; border-radius: 10px; border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .s-btn.red { background: var(--red); border-color: var(--red); color: #fff; }
+    .s-btn.gold { background: var(--gold); border-color: var(--gold); color: #171104; }
+    .s-chip {
+      display: inline-block; font-size: 8.5px; font-weight: 700;
+      padding: 4px 8px; border-radius: 999px; color: var(--text-soft);
+      background: var(--surface-muted); border: 1px solid var(--border);
+    }
+    .s-chip.on { background: var(--gold); border-color: var(--gold); color: #151008; }
+    .s-bar { height: 5px; border-radius: 999px; background: var(--surface-muted); overflow: hidden; margin: 8px 0; }
+    .s-bar > i { display: block; height: 100%; border-radius: 999px; }
+    .s-metric-v { font-size: 18px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .s-metric-l { font-size: 7.5px; color: var(--text-soft); }
+    .s-wrap-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    /* ---------- story ---------- */
+    .rule { height: 1px; background: var(--border); border: 0; }
+
+    .story p { font-size: 17.5px; line-height: 1.75; }
+    .pull {
+      border-left: 3px solid var(--gold); padding: 4px 0 4px 22px;
+      margin: 30px 0; font-size: 20px; line-height: 1.6;
+      color: var(--text); font-weight: 600;
+    }
+
+    ol.steps { list-style: none; counter-reset: s; margin: 26px 0 8px; }
+    ol.steps li {
+      counter-increment: s; position: relative; padding-left: 46px;
+      margin-bottom: 16px; color: var(--text-soft); font-size: 16.5px;
+    }
+    ol.steps li::before {
+      content: counter(s); position: absolute; left: 0; top: -1px;
+      width: 30px; height: 30px; border-radius: 999px;
+      background: var(--surface-muted); border: 1px solid var(--border);
+      color: var(--text); font-size: 12.5px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    ol.steps li:last-child::before {
+      background: var(--green); border-color: var(--green); color: #06210E;
+    }
+    ol.steps li:last-child { color: var(--text); font-weight: 600; }
+
+    /* ---------- loop ---------- */
+    .loop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 34px; }
+    @media (max-width: 780px) { .loop { grid-template-columns: repeat(2, 1fr); } }
+    .loop .step {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px 18px;
+    }
+    .loop .n {
+      font-size: 11px; font-weight: 800; letter-spacing: 1.6px;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+    }
+    .loop p { font-size: 14.5px; margin: 0; color: var(--muted); line-height: 1.55; }
+
+    /* ---------- features ---------- */
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 34px; }
+    @media (max-width: 880px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; padding: 24px 22px;
+    }
+    .card p { font-size: 14.5px; color: var(--muted); margin: 0; line-height: 1.6; }
+
+    /* ---------- privacy ---------- */
+    .privacy {
+      background: var(--bg-soft); border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .checks { list-style: none; margin-top: 26px; display: grid; gap: 12px; }
+    .checks li { color: var(--text-soft); font-size: 16.5px; padding-left: 30px; position: relative; }
+    .checks li::before {
+      content: "✓"; position: absolute; left: 0; top: 0;
+      color: var(--green); font-weight: 900; font-size: 15px;
+    }
+
+    /* ---------- promise ---------- */
+    .promise { text-align: center; }
+    .promise .big {
+      font-size: clamp(22px, 3.4vw, 30px); font-weight: 800;
+      line-height: 1.45; letter-spacing: -0.5px; color: var(--text);
+      max-width: 720px; margin: 0 auto 22px;
+    }
+    .promise .italic { font-style: italic; color: var(--muted); font-size: 18px; }
+
+    /* ---------- footer ---------- */
+    footer { border-top: 1px solid var(--border); padding: 44px 0 56px; text-align: center; }
+    .flinks { display: flex; gap: 8px 26px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .flinks a { font-size: 15px; }
+    .fnote { color: var(--muted-dark); font-size: 13px; line-height: 1.6; }
+
+    /* used only if real screenshots are dropped in — see comment at top */
+    .shot { width: 100%; height: 100%; object-fit: cover; display: block; }
   </style>
 </head>
 <body>
-  <div class="hero">
-    <div class="badge">Local-first · No accounts · No tracking</div>
-    <h1><span>Signal.</span> Break any habit.</h1>
-    <p class="tagline">A private 10-minute interruption system for urges, cravings, and unwanted patterns. Built around habit-loop awareness. Everything stays on your device.</p>
-    <a class="cta" href="https://apps.apple.com/us/app/signal-urge-reset/id6776899029">Download on the App Store</a>
-    <p class="cta-note">Free. No account required. Rated 18+.</p>
+
+  <!-- ================= HERO ================= -->
+  <div class="wrap">
+    <header class="hero">
+      <div class="badge">Local-first · No accounts · No tracking</div>
+      <h1><span class="accent">Signal.</span><br>Break any habit.</h1>
+      <p class="tagline">
+        A private 10-minute interruption system for urges, cravings, and unwanted patterns.
+        Built on habit-loop awareness. Everything stays on your device.
+      </p>
+      <a class="cta" href="https://apps.apple.com/us/app/signal-urge-reset/id6776899029">Download on the App Store</a>
+      <p class="cta-note">Free. No account required. Rated 18+.</p>
+
+      <div class="phones">
+        <div class="phone-wrap">
+          <div class="phone"><div class="screen">
+            <div class="island"></div>
+            <div class="scr">
+              <div class="s-eyebrow">Saturday, Aug 2</div>
+              <div class="s-title">Signal</div>
+              <div class="s-card green">
+                <div class="s-row" style="margin-bottom:7px">
+                  <span style="width:6px;height:6px;border-radius:99px;background:var(--green)"></span>
+                  <span class="s-label" style="margin:0">Current state</span>
+                </div>
+                <div style="display:flex;align-items:flex-end;gap:6px">
+                  <span style="font-size:34px;line-height:1;font-weight:900;color:var(--green)">Green</span>
+                  <span class="s-label" style="margin:0 0 3px">zone</span>
+                </div>
+                <div style="font-size:10.5px;color:var(--text-soft);margin-top:6px">Clear. Stable. Focused.</div>
+                <div style="font-size:9.5px;color:var(--muted);font-style:italic;margin-top:3px">
+                  You are not seeking stimulation. Keep structure visible.
+                </div>
+                <div class="s-row" style="margin-top:10px">
+                  <span class="s-btn red">Emergency</span>
+                  <span class="s-btn">Check in</span>
+                </div>
+              </div>
+              <div class="s-card">
+                <div class="s-between">
+                  <div>
+                    <div class="s-label">Urge level</div>
+                    <div class="s-metric-v" style="color:var(--green)">18%</div>
+                    <div class="s-metric-l">stable</div>
+                  </div>
+                  <div>
+                    <div class="s-label">Progress</div>
+                    <div class="s-metric-v">12</div>
+                    <div class="s-metric-l">days structured</div>
+                  </div>
+                </div>
+                <div class="s-bar"><i style="width:18%;background:var(--green)"></i></div>
+                <div style="font-size:9px;color:var(--muted);margin-top:2px">
+                  Stable signal. Keep structure visible and avoid idle feeds.
+                </div>
+              </div>
+              <div class="s-card gold">
+                <div class="s-label">10-minute protocol</div>
+                <div class="s-between">
+                  <div><div class="s-metric-v" style="font-size:15px">14</div><div class="s-metric-l">check-ins</div></div>
+                  <div><div class="s-metric-v" style="font-size:15px;color:var(--green)">6</div><div class="s-metric-l">SOS done</div></div>
+                  <div><div class="s-metric-v" style="font-size:15px">2</div><div class="s-metric-l">reviews</div></div>
+                </div>
+              </div>
+              <div class="s-card">
+                <div class="s-label">Redirect actions</div>
+                <div class="s-between">
+                  <div>
+                    <div style="font-size:10.5px;font-weight:800">Walk without phone</div>
+                    <div style="font-size:8.5px;color:var(--text-soft)">Change state before thinking it through.</div>
+                  </div>
+                  <span class="s-chip">12 min</span>
+                </div>
+              </div>
+            </div>
+          </div></div>
+          <div class="phone-cap"><b>Know where you stand</b>One glance tells you whether to keep going or interrupt.</div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone"><div class="screen">
+            <div class="island"></div>
+            <div class="scr">
+              <div class="s-eyebrow">Emergency mode</div>
+              <div class="s-title">Move now.</div>
+              <div class="s-sub">Cue detected. Name it, delay 10 minutes, move your body, then reflect.</div>
+              <div class="s-card red">
+                <div class="s-label">Intervention timer</div>
+                <div style="font-size:44px;line-height:1.05;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;text-align:center;margin:4px 0">
+                  10:00
+                </div>
+                <div class="s-bar"><i style="width:8%;background:var(--red)"></i></div>
+                <div class="s-row" style="margin-bottom:8px">
+                  <span class="s-chip">5 min</span><span class="s-chip on">10 min</span>
+                </div>
+                <div class="s-row">
+                  <span class="s-btn red">Start</span>
+                  <span class="s-btn">Reflect now</span>
+                </div>
+              </div>
+              <div class="s-card">
+                <div class="s-label">Choose one action</div>
+                <div class="s-wrap-chips">
+                  <span class="s-chip" style="background:var(--red);border-color:var(--red);color:#fff">Walk outside</span>
+                  <span class="s-chip">Cold water</span>
+                  <span class="s-chip">Pushups</span>
+                  <span class="s-chip">Leave the room</span>
+                </div>
+              </div>
+              <div class="s-card">
+                <div class="s-label">Immediate steps</div>
+                <div class="s-row" style="margin-bottom:5px">
+                  <span style="width:16px;height:16px;border-radius:99px;background:var(--red);color:#fff;font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center">1</span>
+                  <span style="font-size:9.5px;color:var(--text-soft)">Pause</span>
+                </div>
+                <div class="s-row" style="margin-bottom:5px">
+                  <span style="width:16px;height:16px;border-radius:99px;background:var(--surface-muted);font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center">2</span>
+                  <span style="font-size:9.5px;color:var(--text-soft)">Stand up</span>
+                </div>
+                <div class="s-row">
+                  <span style="width:16px;height:16px;border-radius:99px;background:var(--surface-muted);font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center">3</span>
+                  <span style="font-size:9.5px;color:var(--text-soft)">Move away from screen</span>
+                </div>
+              </div>
+            </div>
+          </div></div>
+          <div class="phone-cap"><b>Interrupt the loop</b>Ten minutes of delay, then one physical move.</div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone"><div class="screen">
+            <div class="island"></div>
+            <div class="scr">
+              <div class="s-eyebrow">Pattern map</div>
+              <div class="s-title">See the sequence.</div>
+              <div class="s-card">
+                <div class="s-label">Local signal count</div>
+                <div class="s-between">
+                  <div><div class="s-metric-v" style="font-size:15px">14</div><div class="s-metric-l">check-ins</div></div>
+                  <div><div class="s-metric-v" style="font-size:15px">6</div><div class="s-metric-l">protocols</div></div>
+                  <div><div class="s-metric-v" style="font-size:15px">9</div><div class="s-metric-l">pauses</div></div>
+                  <div><div class="s-metric-v" style="font-size:15px">2</div><div class="s-metric-l">reviews</div></div>
+                </div>
+              </div>
+              <div class="s-card gold">
+                <div class="s-label">Weekly review</div>
+                <div style="font-size:13px;font-weight:900;line-height:1.3">
+                  9 signals this week. Top trigger: Late-night phone.
+                </div>
+                <div style="font-size:9.5px;color:var(--text-soft);margin-top:5px">
+                  Repeat Walk outside when the urge climbs; it has lowered intensity by 31 points on average.
+                </div>
+              </div>
+              <div class="s-card">
+                <div class="s-label">Top triggers</div>
+                <div class="s-between" style="margin-bottom:7px">
+                  <div>
+                    <div style="font-size:10.5px;font-weight:800">Late-night phone</div>
+                    <div style="font-size:8.5px;color:var(--text-soft)">Avg urge level 71%</div>
+                  </div>
+                  <span class="s-chip on">5x</span>
+                </div>
+                <div class="s-between">
+                  <div>
+                    <div style="font-size:10.5px;font-weight:800">Boredom</div>
+                    <div style="font-size:8.5px;color:var(--text-soft)">Avg urge level 44%</div>
+                  </div>
+                  <span class="s-chip">3x</span>
+                </div>
+              </div>
+              <div class="s-card">
+                <div class="s-label">Danger windows</div>
+                <div class="s-wrap-chips">
+                  <span class="s-chip">23:00-00:00 · 4</span>
+                  <span class="s-chip">14:00-15:00 · 2</span>
+                </div>
+              </div>
+            </div>
+          </div></div>
+          <div class="phone-cap"><b>Make the pattern visible</b>Your triggers and danger windows, learned on-device.</div>
+        </div>
+      </div>
+    </header>
   </div>
 
-  <div class="cards">
-    <div class="card">
-      <h3>10-Minute Timer</h3>
-      <p>When the urge hits, start the timer. Don't fight it — just delay it. Move your body, redirect the energy, and let the craving pass.</p>
-    </div>
-    <div class="card">
-      <h3>Pattern Map</h3>
-      <p>Signal builds a private map of your triggers, danger windows, and what redirects actually work. The pattern becomes visible, so it loses power.</p>
-    </div>
-    <div class="card">
-      <h3>Completely Private</h3>
-      <p>No accounts. No analytics. No cloud. No tracking. Your data never leaves your device. Ever.</p>
-    </div>
-    <div class="card">
-      <h3>Systems Over Willpower</h3>
-      <p>Identify the cue, interrupt the routine, redirect the reward. Build a system instead of relying on force.</p>
-    </div>
-  </div>
+  <!-- ================= STORY ================= -->
+  <section>
+    <div class="wrap narrow story">
+      <div class="eyebrow">Why Signal exists</div>
+      <h2>It started as a system that worked.</h2>
 
-  <div class="links">
-    <a href="/privacy">Privacy Policy</a>
-    <a href="/terms">Terms of Service</a>
-    <a href="/support">Contact Support</a>
-  </div>
+      <p class="lede">
+        Signal began with a book that changed how I think about habits. The framework that clicked was simple:
+        you don't break a habit by forcing yourself to stop. You break it by building a system.
+      </p>
+
+      <div class="pull">
+        Identify the cue. Interrupt the routine. Redirect the reward.<br>
+        Make the pattern visible, and it loses its power over you.
+      </div>
+
+      <p>
+        Like most people, porn had been part of my life at some point. I wasn't addicted — but I wanted the pattern
+        gone entirely. Not because of shame. Because I wanted to choose what got my time and attention.
+      </p>
+
+      <p>So I built myself a system:</p>
+
+      <ol class="steps">
+        <li>Every time I felt an urge, I set a 10-minute timer.</li>
+        <li>During those 10 minutes, I didn't try to fight it. I just didn't act on it.</li>
+        <li>I wrote down what triggered the urge — time of day, mood, situation.</li>
+        <li>I built a mind map of my cues and triggers.</li>
+        <li>Eventually, the urges stopped coming.</li>
+      </ol>
+
+      <p class="dim" style="margin-top:26px">
+        Signal is that system, turned into an app — because the notebook and the timer worked, and nothing on the
+        App Store did the same thing without shame, surveillance, or a subscription in front of the panic button.
+      </p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ================= THE LOOP ================= -->
+  <section>
+    <div class="wrap">
+      <div class="narrow" style="text-align:center">
+        <div class="eyebrow">The habit-loop framework</div>
+        <h2>Four steps, one interruption.</h2>
+        <p>Every cue-driven habit runs the same circuit. Signal breaks it at the point of most leverage — the gap between the craving and the response.</p>
+      </div>
+      <div class="loop">
+        <div class="step">
+          <div class="n">Cue</div>
+          <p>The trigger that starts the loop. Signal helps you name it.</p>
+        </div>
+        <div class="step">
+          <div class="n">Craving</div>
+          <p>The urge to act. The 10-minute timer interrupts it.</p>
+        </div>
+        <div class="step">
+          <div class="n">Response</div>
+          <p>The redirect action. Walk, write, move — anything but the old pattern.</p>
+        </div>
+        <div class="step">
+          <div class="n">Reward</div>
+          <p>The pattern map shows you it's working. That becomes the new reward.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ================= FEATURES ================= -->
+  <section>
+    <div class="wrap">
+      <div class="narrow" style="text-align:center">
+        <div class="eyebrow">What's inside</div>
+        <h2>Everything is free.</h2>
+        <p>The panic tools never sit behind a paywall.</p>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>10-minute protocol</h3>
+          <p>When the urge hits, start the timer. Don't fight it — delay it. Name the cue, move your body, then log what actually helped.</p>
+        </div>
+        <div class="card">
+          <h3>Pause timer</h3>
+          <p>A 30, 60, or 90-second interruption for when the full protocol is too much. Ends on a redirect you picked in advance.</p>
+        </div>
+        <div class="card">
+          <h3>Pattern map</h3>
+          <p>Your top triggers, danger windows, emotion-trigger pairs, and which redirects actually lowered your intensity.</p>
+        </div>
+        <div class="card">
+          <h3>Slip review</h3>
+          <p>If the sequence crossed a line, review it without a shame spiral. No binge logic. Find the first wrong turn and protect the next 24 hours.</p>
+        </div>
+        <div class="card">
+          <h3>App Lock</h3>
+          <p>Face ID, Touch ID, or your passcode. Signal also covers itself in the app switcher, so a glance at your phone shows nothing.</p>
+        </div>
+        <div class="card">
+          <h3>Yours to take</h3>
+          <p>Export everything to a file you keep, and import it back on a new phone. No account means nothing to lose access to.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRIVACY ================= -->
+  <section class="privacy">
+    <div class="wrap narrow">
+      <div class="eyebrow">The trust stance</div>
+      <h2>It never leaves your device.</h2>
+      <p>
+        Recovery data is about as sensitive as data gets. Signal's answer is not a promise to guard it well —
+        it's to never receive it in the first place. There is no server to breach.
+      </p>
+      <ul class="checks">
+        <li>No accounts, no sign-up, no email required</li>
+        <li>No analytics, no trackers, no crash SDK, no ad IDs</li>
+        <li>No surveillance screenshots and no accountability partner watching you</li>
+        <li>No streaks engineered to make you feel worse for breaking them</li>
+        <li>Delete everything from inside the app, permanently, at any time</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= PROMISE ================= -->
+  <section class="promise">
+    <div class="wrap narrow">
+      <div class="eyebrow">The promise</div>
+      <p class="big">
+        Signal will never use shame, surveillance, or fake streaks. It gives you a system.
+        The system does the work. And when it works, you stop needing it.
+      </p>
+      <p class="italic">That's the goal — an app that makes itself unnecessary.</p>
+      <p style="margin-top:34px">
+        <a class="cta" href="https://apps.apple.com/us/app/signal-urge-reset/id6776899029">Download on the App Store</a>
+      </p>
+      <p class="cta-note">Free. No account required. Rated 18+.</p>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="wrap">
+      <div class="flinks">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="/support">Contact Support</a>
+        <a href="https://apps.apple.com/us/app/signal-urge-reset/id6776899029">App Store</a>
+      </div>
+      <p class="fnote">
+        Signal is a self-help tool, not a substitute for professional medical or mental health care.<br>
+        If you are in crisis, contact a licensed professional or your local emergency services.
+      </p>
+    </div>
+  </footer>
+
 </body>
 </html>
