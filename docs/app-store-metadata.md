@@ -101,6 +101,43 @@ WHAT'S INCLUDED (FREE)
 Signal does not promise perfect blocking. It increases awareness, adds a 10-minute interruption, and helps you redirect before the loop becomes automatic.
 ```
 
+### What's New — 1.0.3 (build 14)
+
+> Covers everything since the 1.0.2 binary plus its production OTA, so users
+> jumping from the live build see all of it at once. Deliberately silent on
+> high-risk reminders and the weekly digest: both are Pro-gated and Pro is not
+> purchasable while the RevenueCat keys are empty, so no user can reach them.
+> Add them here in the release that turns billing on — not before.
+
+```
+Your history can move with you now.
+
+IMPORT
+Signal can restore a previous export, so a new phone no longer means starting
+over. Privacy > Local data > Import from a Signal export. Merge keeps what is
+already on the device and adds anything new; Replace starts fresh from the file.
+
+LOCK SCREEN SOS
+The SOS widget now works on the Lock Screen, so the 10-minute interruption is
+one tap away without unlocking into the app first.
+
+FIXES
+• Pauses now count toward your days structured, the same as check-ins and protocols.
+• Saving a protocol no longer leaves the previous reflection in the form, which
+  could log the same session twice.
+• Your check-in result clears when you change an answer, so a classification
+  never sits next to edited inputs.
+• Exports on iPhone share a real .json file instead of a wall of text.
+• Signal now tells you if it ever cannot save to your device, instead of failing quietly.
+
+POLISH
+• Timers breathe while running and the zone card fades between states. Both
+  respect Reduce Motion.
+• Larger tap targets throughout, and the story behind Signal is easier to find.
+
+Everything still stays on your device. No account, no trackers, no analytics.
+```
+
 ### Keywords (100 characters max)
 ```
 urge,interrupt,habit,recovery,self-control,mindfulness,timer,private,no-tracker,behavior,reset
