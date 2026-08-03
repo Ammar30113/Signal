@@ -1,6 +1,7 @@
 import { emergencyActions, rationalizationScripts, triggers } from "@/data/signal-data";
 import type {
   CheckInEntry,
+  IdentityProfile,
   ImportSummary,
   InterventionSession,
   PauseSession,
@@ -10,6 +11,7 @@ import type {
   Trigger,
   UrgeState,
 } from "@/types/signal";
+import { sanitizeIdentity } from "@/utils/identity";
 
 // Reading an export back in. Signal has no account and no server, so this file
 // is the only way a user's history survives a new phone — which also means it is
@@ -149,6 +151,13 @@ export interface ParsedImport {
   pauses: PauseSession[];
   slipReviews: SlipReview[];
   customRedirects: RedirectAction[];
+  /**
+   * Present only when the file carried one. Identity is user content, so unlike
+   * settings and entitlement it does travel with an import — but it is applied
+   * only if the file actually had it, so a partial export never wipes what is
+   * already written on this device.
+   */
+  identity?: IdentityProfile;
   skipped: number;
 }
 
@@ -186,6 +195,7 @@ export function parseSignalImport(raw: string): ParsedImport | null {
     pauses: pauses.items,
     slipReviews: slipReviews.items,
     customRedirects: customRedirects.items,
+    identity: isRecord(payload.identity) ? sanitizeIdentity(payload.identity) : undefined,
     skipped:
       checkIns.skipped + interventions.skipped + pauses.skipped + slipReviews.skipped + customRedirects.skipped,
   };
@@ -236,6 +246,9 @@ export function mergeSignalImport(
       pauses: pauses.merged,
       slipReviews: slipReviews.merged,
       customRedirects: [...redirectsById.values()],
+      // A merge keeps whatever the user has already written here; taking the
+      // file's version would silently overwrite it.
+      identity: current.identity,
     },
     summary: {
       checkIns: checkIns.added,
@@ -265,6 +278,9 @@ export function replaceWithImport(
       pauses: newestFirst(incoming.pauses),
       slipReviews: newestFirst(incoming.slipReviews),
       customRedirects: incoming.customRedirects,
+      // Replace is the new-phone path, so the file's identity wins — but only
+      // if it carried one. A file without it leaves this device's text alone.
+      identity: incoming.identity ?? current.identity,
     },
     summary: {
       checkIns: incoming.checkIns.length,

@@ -1,7 +1,8 @@
 import "expo-sqlite/localStorage/install";
 
-import { initialSnapshot } from "@/data/signal-data";
+import { defaultIdentity, initialSnapshot } from "@/data/signal-data";
 import type { Entitlement, SignalPersistedState, UserSettings } from "@/types/signal";
+import { sanitizeIdentity } from "@/utils/identity";
 
 const STORAGE_KEY = "signal.local-first.v1";
 
@@ -29,6 +30,7 @@ export const defaultPersistedState: SignalPersistedState = {
   pauses: [],
   slipReviews: [],
   customRedirects: [],
+  identity: defaultIdentity,
   settings: defaultSettings,
   entitlement: defaultEntitlement,
 };
@@ -56,6 +58,9 @@ export function loadSignalState(): SignalPersistedState {
       pauses: parsed.pauses ?? [],
       slipReviews: parsed.slipReviews ?? [],
       customRedirects: parsed.customRedirects ?? [],
+      // Installs from before the Identity tab was editable have no `identity`
+      // key at all; sanitize falls back to the defaults they were already seeing.
+      identity: sanitizeIdentity(parsed.identity),
       settings,
       entitlement: { ...defaultEntitlement, ...parsed.entitlement },
     };

@@ -108,13 +108,19 @@ Connect and awaiting a manual Submit for Review — it has not been released.**
 TestFlight against build 14, then Submit for Review in App Store Connect. The
 "What's New" copy is ready in `docs/app-store-metadata.md`.
 
-### Built but NOT shipped: the history screen
+### Built but NOT shipped: history screen + Identity personalisation
 
-`app/history.tsx` (read every entry back, delete individual ones) is in the
-tree but is **not in build 14** and **must not be published to the `production`
-channel while 1.0.3 is in review**. It adds a screen and a destructive action —
-that is behaviour-changing, not copy, and pushing it mid-review risks a
+Two features are in the tree, **not in build 14**, and **must not be published
+to the `production` channel while 1.0.3 is in review**. Both are
+behaviour-changing rather than copy, and pushing them mid-review risks a
 reviewer seeing something the submitted binary did not contain.
+
+- `app/history.tsx` — read every entry back, delete individual ones.
+- Identity personalisation — the Identity tab's three answers and value chips
+  are now user-written (`identity` in persisted state, `utils/identity.ts`).
+  Note this adds a new top-level key to the stored payload; older installs
+  without it fall back to Signal's defaults via `sanitizeIdentity`, so the
+  rollout is backward-compatible in both directions.
 
 Two valid ways to ship it, once 1.0.3 is approved and live:
 
@@ -266,6 +272,14 @@ the regression script for every future release.
 - [ ] History: delete every entry → empty state appears, no crash, progress
       days resets
 - [ ] History: scroll a long list (import a large export first) → no blank rows
+- [ ] Identity: fresh install shows the gold "These are Signal's words" nudge
+- [ ] Identity: edit all three answers + add/remove value chips → Save → text
+      persists across a force-quit, and the nudge is gone
+- [ ] Identity: Cancel discards edits rather than saving them
+- [ ] Identity: type a value but tap Save without tapping Add → it is still kept
+- [ ] Identity: export → delete local data → import (Replace) → identity returns
+- [ ] Identity: import (Merge) onto a device with its own identity → the local
+      text is kept, not overwritten
 
 ### Post-Launch
 - [x] App approved — live on the App Store as of ~July 9, 2026

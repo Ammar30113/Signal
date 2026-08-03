@@ -59,6 +59,12 @@ const emptyState: SignalPersistedState = {
   pauses: [],
   slipReviews: [],
   customRedirects: [],
+  identity: {
+    why: "Local why.",
+    becoming: "Local becoming.",
+    protects: "Local protects.",
+    values: ["Focus"],
+  },
   settings: {
     hasCompletedOnboarding: true,
     appLockEnabled: true,
@@ -174,5 +180,37 @@ for (const [label, outcome] of [
   assertEqual(outcome.state.settings.appLockEnabled, true, `${label} must not disable App Lock from a file`);
   assertEqual(outcome.state.settings.hasCompletedOnboarding, true, `${label} keeps local onboarding state`);
 }
+
+// --- identity travels with an import, settings and entitlement do not --------
+
+const withIdentity = parseSignalImport(JSON.stringify({
+  app: "Signal",
+  checkIns: [checkIn],
+  identity: { why: "Imported why.", becoming: "Imported becoming.", protects: "Imported protects.", values: ["Sleep"] },
+}));
+assertOk(withIdentity);
+assertEqual(withIdentity.identity?.why, "Imported why.");
+
+// Replace is the new-phone path: the file's identity wins.
+assertEqual(replaceWithImport(emptyState, withIdentity).state.identity.why, "Imported why.");
+// Merge keeps what is already written on this device.
+assertEqual(mergeSignalImport(emptyState, withIdentity).state.identity.why, "Local why.");
+
+// A file with no identity at all must never blank out the local one.
+const withoutIdentity = parseSignalImport(JSON.stringify({ app: "Signal", checkIns: [checkIn] }));
+assertOk(withoutIdentity);
+assertEqual(withoutIdentity.identity, undefined, "absent identity stays absent, not defaulted");
+assertEqual(replaceWithImport(emptyState, withoutIdentity).state.identity.why, "Local why.");
+assertEqual(mergeSignalImport(emptyState, withoutIdentity).state.identity.why, "Local why.");
+
+// A malformed identity block is sanitised rather than trusted or fatal.
+const hostileIdentity = parseSignalImport(JSON.stringify({
+  app: "Signal",
+  checkIns: [checkIn],
+  identity: { why: "z".repeat(5000), values: ["dup", "DUP", 9] },
+}));
+assertOk(hostileIdentity);
+assertEqual(hostileIdentity.identity!.why.length, 280, "over-long imported text is clamped");
+assertEqual(hostileIdentity.identity!.values.join(","), "dup", "imported values are deduped and cleaned");
 
 console.log("signal-import tests passed");

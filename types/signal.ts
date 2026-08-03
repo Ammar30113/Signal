@@ -219,6 +219,26 @@ export interface Entitlement {
 }
 
 /**
+ * What the user is doing this for, in their own words. Seeded with Signal's
+ * default copy so the screen is never blank, then edited into something
+ * personal — the point of the Identity tab is that it is theirs, not ours.
+ *
+ * This is user content, not device configuration, so unlike `settings` it IS
+ * restored by an import.
+ */
+export interface IdentityProfile {
+  why: string;
+  becoming: string;
+  protects: string;
+  /** Short labels for what this is protecting — rendered as chips. */
+  values: string[];
+}
+
+export const IDENTITY_TEXT_LIMIT = 280;
+export const IDENTITY_VALUE_LIMIT = 24;
+export const IDENTITY_MAX_VALUES = 12;
+
+/**
  * Everything Signal keeps on the device. Lives here rather than in utils/storage
  * so the pure import/merge logic can be tested without pulling in the SQLite
  * localStorage shim, which cannot load outside the app runtime.
@@ -230,6 +250,7 @@ export interface SignalPersistedState {
   pauses: PauseSession[];
   slipReviews: SlipReview[];
   customRedirects: RedirectAction[];
+  identity: IdentityProfile;
   settings: UserSettings;
   entitlement: Entitlement;
 }

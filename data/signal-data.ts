@@ -1,5 +1,6 @@
 import type {
   EmergencyAction,
+  IdentityProfile,
   RationalizationScript,
   RedirectAction,
   SignalSnapshot,
@@ -85,17 +86,18 @@ export const escalationPath = [
   "Fog, regret, or depletion",
 ];
 
-export const identitySections = [
-  {
-    title: "Why I am doing this",
-    body: "Protect focus, clarity, and the ability to choose long-term value over short-term impulse.",
-  },
-  {
-    title: "Who I am becoming",
-    body: "Someone who notices the signal early, interrupts the pattern, and builds systems instead of relying on willpower.",
-  },
-  {
-    title: "What this protects",
-    body: "Energy, time, relationships, self-respect, and the momentum that compounds when you stay consistent.",
-  },
-];
+// Starting point for the Identity tab. Seeded on first launch so the screen is
+// never empty, then edited by the user into their own words.
+export const defaultIdentity: IdentityProfile = {
+  why: "Protect focus, clarity, and the ability to choose long-term value over short-term impulse.",
+  becoming:
+    "Someone who notices the signal early, interrupts the pattern, and builds systems instead of relying on willpower.",
+  protects: "Energy, time, relationships, self-respect, and the momentum that compounds when you stay consistent.",
+  values: ["Focus", "Energy", "Time", "Relationships", "Self-respect"],
+};
+
+export const identityPrompts = {
+  why: { title: "Why I am doing this", hint: "The reason that still holds at 1am." },
+  becoming: { title: "Who I am becoming", hint: "Describe the person, not the streak." },
+  protects: { title: "What this protects", hint: "Name what is actually at stake." },
+} as const;

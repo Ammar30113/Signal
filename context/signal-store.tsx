@@ -9,6 +9,7 @@ import type {
   CheckInEntry,
   CheckInResult,
   Entitlement,
+  IdentityProfile,
   ImportSummary,
   InterventionSession,
   PauseSession,
@@ -40,6 +41,7 @@ import {
 } from "@/utils/notifications";
 import { maybeRequestStoreReview } from "@/utils/review-prompt";
 import type { HistoryKind } from "@/utils/history";
+import { sanitizeIdentity } from "@/utils/identity";
 import {
   mergeSignalImport,
   replaceWithImport,
@@ -77,6 +79,7 @@ interface SignalContextValue {
   interventions: InterventionSession[];
   pauses: PauseSession[];
   slipReviews: SlipReview[];
+  identity: IdentityProfile;
   settings: UserSettings;
   entitlement: Entitlement;
   patternAggregate: PatternAggregate;
@@ -90,6 +93,7 @@ interface SignalContextValue {
   saveSlipReview: (review: Omit<SlipReview, "id" | "createdAt">) => SlipReview;
   addCustomRedirect: (input: RedirectActionInput) => RedirectAction | null;
   deleteCustomRedirect: (id: string) => void;
+  updateIdentity: (next: IdentityProfile) => void;
   updateSettings: (patch: Partial<UserSettings>) => void;
   setLocalEntitlement: (plan: Entitlement["plan"]) => void;
   refreshEntitlement: () => Promise<void>;
@@ -117,6 +121,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
   const [pauses, setPauses] = React.useState<PauseSession[]>([]);
   const [slipReviews, setSlipReviews] = React.useState<SlipReview[]>([]);
   const [customRedirects, setCustomRedirects] = React.useState<RedirectAction[]>([]);
+  const [identity, setIdentity] = React.useState<IdentityProfile>(defaultPersistedState.identity);
   const [settings, setSettings] = React.useState<UserSettings>(defaultSettings);
   const [entitlement, setEntitlement] = React.useState<Entitlement>(defaultEntitlement);
   const [isHydrated, setIsHydrated] = React.useState(false);
@@ -131,6 +136,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     setPauses(persisted.pauses);
     setSlipReviews(persisted.slipReviews);
     setCustomRedirects(persisted.customRedirects);
+    setIdentity(persisted.identity);
     setSettings(persisted.settings);
     setEntitlement(persisted.entitlement);
     setIsHydrated(true);
@@ -164,6 +170,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       pauses,
       slipReviews,
       customRedirects,
+      identity,
       settings,
       entitlement,
     };
@@ -171,7 +178,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     // Everything except `snapshot` — history, settings, entitlement. These
     // change rarely and matter, so they are written straight away. A snapshot-
     // only change is the slider moving, which can wait.
-    const slice = [checkIns, interventions, pauses, slipReviews, customRedirects, settings, entitlement];
+    const slice = [checkIns, interventions, pauses, slipReviews, customRedirects, identity, settings, entitlement];
     const previous = lastSavedSliceRef.current;
     lastSavedSliceRef.current = slice;
 
@@ -190,7 +197,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       saveTimerRef.current = null;
     };
-  }, [checkIns, customRedirects, entitlement, flushSave, interventions, isHydrated, pauses, settings, slipReviews, snapshot]);
+  }, [checkIns, customRedirects, entitlement, flushSave, identity, interventions, isHydrated, pauses, settings, slipReviews, snapshot]);
 
   // A debounced write must not die with the app. Flush the moment we stop being
   // foregrounded, and on teardown.
@@ -512,6 +519,13 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     notifySelection();
   }, []);
 
+  // Sanitised on the way in as well as on the way out of storage, so a very long
+  // paste or a duplicated value never reaches state in the first place.
+  const updateIdentity = React.useCallback((next: IdentityProfile) => {
+    setIdentity(sanitizeIdentity(next));
+    notifySelection();
+  }, []);
+
   const updateSettings = React.useCallback((patch: Partial<UserSettings>) => {
     setSettings((current) => ({ ...current, ...patch }));
     notifySelection();
@@ -562,12 +576,13 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       pauses,
       slipReviews,
       customRedirects,
+      identity,
       settings,
       entitlement,
     };
 
     return createSignalExport(state);
-  }, [checkIns, customRedirects, entitlement, interventions, pauses, settings, slipReviews, snapshot]);
+  }, [checkIns, customRedirects, entitlement, identity, interventions, pauses, settings, slipReviews, snapshot]);
 
   const importLocalData = React.useCallback(
     (parsed: ParsedImport, mode: "merge" | "replace") => {
@@ -578,6 +593,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
         pauses,
         slipReviews,
         customRedirects,
+        identity,
         settings,
         entitlement,
       };
@@ -589,6 +605,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       setPauses(state.pauses);
       setSlipReviews(state.slipReviews);
       setCustomRedirects(state.customRedirects);
+      setIdentity(state.identity);
       // Recompute rather than trusting the file's snapshot: it describes the
       // device it was exported from, and after a merge it may not even be the
       // most recent event any more.
@@ -605,7 +622,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
 
       return summary;
     },
-    [checkIns, customRedirects, entitlement, interventions, pauses, settings, slipReviews, snapshot],
+    [checkIns, customRedirects, entitlement, identity, interventions, pauses, settings, slipReviews, snapshot],
   );
 
   const clearLocalData = React.useCallback(() => {
@@ -616,6 +633,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     setPauses([]);
     setSlipReviews([]);
     setCustomRedirects([]);
+    setIdentity(defaultPersistedState.identity);
     setSettings(defaultSettings);
     setEntitlement(defaultEntitlement);
     notifySelection();
@@ -630,6 +648,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       interventions,
       pauses,
       slipReviews,
+      identity,
       settings,
       entitlement,
       patternAggregate,
@@ -642,6 +661,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       saveSlipReview,
       addCustomRedirect,
       deleteCustomRedirect,
+      updateIdentity,
       updateSettings,
       setLocalEntitlement,
       refreshEntitlement,
@@ -661,6 +681,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       deleteHistoryEntry,
       entitlement,
       exportLocalData,
+      identity,
       importLocalData,
       interventions,
       isHydrated,
@@ -675,6 +696,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       slipReviews,
       snapshot,
       submitCheckIn,
+      updateIdentity,
       updateIntensity,
       updateSettings,
     ],
