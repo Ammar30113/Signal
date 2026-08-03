@@ -18,10 +18,13 @@ export default function AboutScreen() {
         <SectionTitle title="The origin" />
         <View style={{ gap: 14 }}>
           <AppText style={{ color: theme.colors.textSoft, fontSize: 16, lineHeight: 26 }}>
-            Signal started because I read a book that changed how I think about habits.
+            In 2023 I read Atomic Habits. The part that stuck wasn't about motivation or discipline — it was that behaviour runs on a loop. Cue, craving, response, reward.
           </AppText>
           <AppText style={{ color: theme.colors.textSoft, fontSize: 16, lineHeight: 26 }}>
-            The framework that clicked was simple: you don't break a habit by forcing yourself to stop. You break it by building a system.
+            You don't break a loop by wanting badly enough to break it. You break it by building a system that interrupts it at a specific point. Everybody needs one.
+          </AppText>
+          <AppText style={{ color: theme.colors.textSoft, fontSize: 16, lineHeight: 26 }}>
+            Willpower is finite. It drains through the day, and the urge shows up exactly when you have the least of it left. That was never a character flaw. It was a missing system.
           </AppText>
           <AppText style={{ color: theme.colors.textSoft, fontSize: 16, lineHeight: 26 }}>
             Identify the cue. Interrupt the routine. Redirect the reward. Make the pattern visible so it loses power over you.
@@ -36,7 +39,7 @@ export default function AboutScreen() {
             Like most people, porn had been part of my life at some point. I wasn't addicted — but I wanted to get rid of the pattern entirely. Not because of shame. Because I wanted to choose what gets my time and attention.
           </AppText>
           <AppText style={{ color: theme.colors.textSoft, fontSize: 16, lineHeight: 26 }}>
-            After reading the book, I built a simple system for myself:
+            So I stopped trying to out-resist it and built a simple system instead:
           </AppText>
         </View>
         <View style={{ gap: 10, paddingLeft: 4 }}>

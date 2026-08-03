@@ -225,6 +225,14 @@
     }
     ol.steps li:last-child { color: var(--text); font-weight: 600; }
 
+    .habits { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+    .habits span {
+      font-size: 14px; font-weight: 700; color: var(--text-soft);
+      background: var(--surface-muted); border: 1px solid var(--border);
+      padding: 7px 14px; border-radius: 999px;
+    }
+    .habits span:last-child { color: var(--gold); border-color: rgba(245, 194, 75, 0.34); background: rgba(245, 194, 75, 0.07); }
+
     /* ---------- loop ---------- */
     .loop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 34px; }
     @media (max-width: 780px) { .loop { grid-template-columns: repeat(2, 1fr); } }
@@ -469,24 +477,31 @@
   <section>
     <div class="wrap narrow story">
       <div class="eyebrow">Why Signal exists</div>
-      <h2>It started as a system that worked.</h2>
+      <h2>Everybody needs a system.</h2>
 
       <p class="lede">
-        Signal began with a book that changed how I think about habits. The framework that clicked was simple:
-        you don't break a habit by forcing yourself to stop. You break it by building a system.
+        In 2023 I read <em>Atomic Habits</em>. The part that stuck wasn't about motivation or discipline — it was
+        that behaviour runs on a loop. Cue, craving, response, reward. You don't break a loop by wanting badly
+        enough to break it. You break it by building a system that interrupts it at a specific point.
       </p>
 
       <div class="pull">
-        Identify the cue. Interrupt the routine. Redirect the reward.<br>
-        Make the pattern visible, and it loses its power over you.
+        Willpower is the worst possible tool for the job. It's finite, it drains through the day,
+        and the urge shows up exactly when you have the least of it left.
       </div>
+
+      <p>
+        Late. Tired. Bored. Alone. Relying on willpower means betting you'll be strongest at the precise moment
+        you're weakest — and then treating it as a character flaw when that bet doesn't pay off. It was never a
+        character flaw. It was a missing system.
+      </p>
 
       <p>
         Like most people, porn had been part of my life at some point. I wasn't addicted — but I wanted the pattern
         gone entirely. Not because of shame. Because I wanted to choose what got my time and attention.
       </p>
 
-      <p>So I built myself a system:</p>
+      <p>So I stopped trying to out-resist it and built myself a system instead:</p>
 
       <ol class="steps">
         <li>Every time I felt an urge, I set a 10-minute timer.</li>
@@ -497,9 +512,23 @@
       </ol>
 
       <p class="dim" style="margin-top:26px">
-        Signal is that system, turned into an app — because the notebook and the timer worked, and nothing on the
-        App Store did the same thing without shame, surveillance, or a subscription in front of the panic button.
+        That was three years ago. Signal is that system turned into an app — because the timer and the notebook
+        worked, and nothing on the App Store did the same job without shame, surveillance, or a subscription
+        sitting in front of the panic button.
       </p>
+
+      <div style="margin-top:46px">
+        <h3 style="font-size:22px;margin-bottom:10px">The habit changes. The loop doesn't.</h3>
+        <p>
+          Signal was built for one pattern, but nothing in it is specific to that pattern. Any habit that fires on
+          a cue and runs on autopilot has the same shape — and the same ten-minute gap where it can be interrupted.
+        </p>
+        <div class="habits">
+          <span>Porn</span><span>Doomscrolling</span><span>Social media</span><span>Junk food</span>
+          <span>Vaping</span><span>Smoking</span><span>Gambling</span><span>Impulse buying</span>
+          <span>Any cue-driven habit</span>
+        </div>
+      </div>
     </div>
   </section>
 
