@@ -39,6 +39,7 @@ import {
   scheduleWeeklyDigest,
 } from "@/utils/notifications";
 import { maybeRequestStoreReview } from "@/utils/review-prompt";
+import type { HistoryKind } from "@/utils/history";
 import {
   mergeSignalImport,
   replaceWithImport,
@@ -92,6 +93,7 @@ interface SignalContextValue {
   updateSettings: (patch: Partial<UserSettings>) => void;
   setLocalEntitlement: (plan: Entitlement["plan"]) => void;
   refreshEntitlement: () => Promise<void>;
+  deleteHistoryEntry: (kind: HistoryKind, id: string) => void;
   exportLocalData: () => string;
   importLocalData: (parsed: ParsedImport, mode: "merge" | "replace") => ImportSummary;
   clearLocalData: () => void;
@@ -524,6 +526,34 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
     notifySelection();
   }, []);
 
+  // Removing a single logged entry. Everything derived from history has to be
+  // recomputed: the deleted entry may be the one currently driving the snapshot,
+  // and it certainly contributed to the trigger profile and danger windows.
+  const deleteHistoryEntry = React.useCallback(
+    (kind: HistoryKind, id: string) => {
+      const nextCheckIns = kind === "check-in" ? checkIns.filter((entry) => entry.id !== id) : checkIns;
+      const nextInterventions = kind === "protocol" ? interventions.filter((entry) => entry.id !== id) : interventions;
+      const nextPauses = kind === "pause" ? pauses.filter((entry) => entry.id !== id) : pauses;
+      const nextSlipReviews = kind === "slip-review" ? slipReviews.filter((entry) => entry.id !== id) : slipReviews;
+
+      setCheckIns(nextCheckIns);
+      setInterventions(nextInterventions);
+      setPauses(nextPauses);
+      setSlipReviews(nextSlipReviews);
+      setSnapshot((current) =>
+        deriveSnapshot({
+          current,
+          checkIns: nextCheckIns,
+          interventions: nextInterventions,
+          pauses: nextPauses,
+          slipReviews: nextSlipReviews,
+        }),
+      );
+      notifySelection();
+    },
+    [checkIns, interventions, pauses, slipReviews],
+  );
+
   const exportLocalData = React.useCallback(() => {
     const state: SignalPersistedState = {
       snapshot,
@@ -615,6 +645,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       updateSettings,
       setLocalEntitlement,
       refreshEntitlement,
+      deleteHistoryEntry,
       exportLocalData,
       importLocalData,
       clearLocalData,
@@ -627,6 +658,7 @@ export function SignalProvider({ children }: { children: React.ReactNode }) {
       completeIntervention,
       completePause,
       deleteCustomRedirect,
+      deleteHistoryEntry,
       entitlement,
       exportLocalData,
       importLocalData,

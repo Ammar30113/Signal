@@ -1,7 +1,8 @@
+import { router } from "expo-router";
 import React from "react";
 import { View } from "react-native";
 
-import { AppText, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
+import { AppText, Button, Card, Chip, Header, ProgressBar, Row, Screen, SectionTitle, Wrap } from "@/components/ui";
 import { theme } from "@/constants/theme";
 import { escalationPath } from "@/data/signal-data";
 import { useSignal } from "@/context/signal-store";
@@ -47,6 +48,7 @@ export default function PatternScreen() {
             <AppText style={{ color: theme.colors.textSoft }}>reviews</AppText>
           </View>
         </Row>
+        <Button label="Read every entry" tone="secondary" onPress={() => router.push("/history")} />
       </Card>
 
       <Card accentColor={theme.colors.gold}>

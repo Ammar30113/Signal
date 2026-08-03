@@ -108,6 +108,24 @@ Connect and awaiting a manual Submit for Review — it has not been released.**
 TestFlight against build 14, then Submit for Review in App Store Connect. The
 "What's New" copy is ready in `docs/app-store-metadata.md`.
 
+### Built but NOT shipped: the history screen
+
+`app/history.tsx` (read every entry back, delete individual ones) is in the
+tree but is **not in build 14** and **must not be published to the `production`
+channel while 1.0.3 is in review**. It adds a screen and a destructive action —
+that is behaviour-changing, not copy, and pushing it mid-review risks a
+reviewer seeing something the submitted binary did not contain.
+
+Two valid ways to ship it, once 1.0.3 is approved and live:
+
+- `eas update --channel production --environment production` — it is JS-only
+  against runtime `1.0.3`, so an OTA reaches 1.0.3 users. This supersedes the
+  `d226eeff` About-screen update.
+- Or fold it into 1.0.4 with the next native build.
+
+Either way, add its rows from the regression checklist below first — nothing in
+it has run on a device.
+
 ### 1.0.3 is a build, not an OTA
 
 `app.json` moved to `1.0.3` on July 24, 2026, which — under the `appVersion`
@@ -238,6 +256,16 @@ the regression script for every future release.
 - [ ] Notifications (Pro, simulate via the debug toggle): enable reminders and
       the weekly digest, tap each notification → lands on Check-In / Pattern
 - [ ] Notifications: turn Pro off → confirm scheduled notifications stop
+- [ ] History: Pattern → "Read every entry" opens the list, newest first
+- [ ] History: every filter chip shows the right count and filters correctly
+- [ ] History: an SOS reflection and a slip review's three fields are readable in full
+- [ ] History: delete one entry → it disappears, and the Pattern map totals,
+      trigger profile, and danger windows all drop it too
+- [ ] History: delete the newest entry → the dashboard state card re-derives
+      from the next most recent event rather than going stale
+- [ ] History: delete every entry → empty state appears, no crash, progress
+      days resets
+- [ ] History: scroll a long list (import a large export first) → no blank rows
 
 ### Post-Launch
 - [x] App approved — live on the App Store as of ~July 9, 2026

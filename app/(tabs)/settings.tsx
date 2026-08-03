@@ -376,6 +376,7 @@ export default function SettingsScreen() {
             <AppText style={{ color: theme.colors.textSoft }}>reviews</AppText>
           </View>
         </Row>
+        <Button label="Read every entry" tone="secondary" onPress={() => router.push("/history")} />
         <Button label="Export local data" tone="secondary" onPress={handleExport} />
         <Button label="Import from a Signal export" tone="secondary" onPress={() => void handleImport()} />
         <AppText style={{ color: theme.colors.textSoft, fontSize: 13 }}>
