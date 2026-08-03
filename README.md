@@ -37,13 +37,23 @@ Then open Expo Go on Android and scan the QR code. Keep the terminal running whi
 
 Expo Go is for development only and cannot run real store builds, App Lock biometrics, the SOS widget, or IAP.
 
-- **JS / asset / copy changes** (same native runtime): `eas update --channel production --message "…"`
+- **JS / asset / copy changes** (same native runtime):
+  ```bash
+  npx eas update --channel production --environment production --message "…"
+  ```
+  `--environment` is required alongside `--channel` in non-interactive mode, or
+  the command errors before it bundles anything.
 - **Native, config, widget, or SDK changes**: bump `version` in `app.json`, then
   ```bash
   npx eas build -p ios --profile production
   npx eas submit -p ios --profile production
   ```
+  Bumping `version` also moves `runtimeVersion` (the policy is `appVersion`), so
+  updates published afterwards no longer reach users on the older build. That is
+  the intended safety behaviour, not a bug — see docs/production-readiness.md.
 
-Run `npm run typecheck` and `npm run test:logic` before either path.
+Run `npm run typecheck` and `npm run test:logic` before either path. CI runs
+both plus `expo install --check` on every push, and needs a Node major that
+bundles npm 11.
 
 See [docs/production-readiness.md](docs/production-readiness.md) for release status, the on-device regression checklist, and the v1.1 Pro playbook.

@@ -84,11 +84,29 @@ To enable Pro (v1.1):
 
 ## Current Release Status
 
-**Live on the App Store: v1.0.2. Working tree: v1.0.3, unreleased.**
+**Live on the App Store: v1.0.2. v1.0.3 build 14 is uploaded to App Store
+Connect and awaiting a manual Submit for Review — it has not been released.**
 
 - Live listing verified at https://apps.apple.com/us/app/signal-urge-reset/id6776899029 — v1.0.2, Free, 18+, Health & Fitness, released ~July 9, 2026.
 - iOS `1.0.2` build `13` came from EAS build `8598e4c0-045d-46a9-9747-c6a03fd8bd6d` (commit `fb1ba2d`).
-- A production EAS Update for runtime `1.0.2` was published from commit `2bb0762` as update group `c7a07b26-fc60-4ce1-9f7b-b72b1f0ac9a1`.
+- A production EAS Update for runtime `1.0.2` was published from commit `2bb0762` as update group `c7a07b26-fc60-4ce1-9f7b-b72b1f0ac9a1`. **This is what live users run today.**
+
+### v1.0.3 (build 14) — uploaded Aug 2, 2026
+
+- EAS build `a93dc96c-b613-4956-beef-4f826b76e985` from commit `35f57ce`,
+  version `1.0.3`, build number `14`, runtime `1.0.3`. Finished in ~5 minutes.
+  This is the first build to compile the Lock Screen widget families for real;
+  they had only ever been `swiftc -typecheck`'d before.
+- Submitted to App Store Connect as submission `2c9d1438-d7f1-4f24-91d7-f86e9e71af33`
+  using the App Store Connect API key stored on EAS servers.
+- A production EAS Update for runtime `1.0.3` was published from commit
+  `74b933e` as update group `d226eeff-d2f2-426a-bcf4-bca4354a1a9c` (the About
+  screen rewrite). It reaches nobody until build 14 is released, then applies on
+  first launch.
+
+**Still owed before release:** the on-device regression pass below, run from
+TestFlight against build 14, then Submit for Review in App Store Connect. The
+"What's New" copy is ready in `docs/app-store-metadata.md`.
 
 ### 1.0.3 is a build, not an OTA
 
@@ -103,18 +121,28 @@ are native and would break under an OTA that pretended otherwise.
   (`expo-router`, `expo-updates`, `react-native-screens`, and others). The JS in
   this tree is built against that newer native code.
 
-Because the runtimes no longer match, an accidental `eas update --channel
-production` is now a no-op for 1.0.2 users rather than a mismatched bundle.
+Because the runtimes no longer match, an `eas update --channel production` from
+this tree is a no-op for 1.0.2 users rather than a mismatched bundle. The
+channel now serves two updates partitioned by runtime — 1.0.2 users keep
+getting `c7a07b26`, and `d226eeff` waits for 1.0.3. That split is the safety
+mechanism; do not defeat it by pinning `runtimeVersion` to a literal.
 
-Ship path for 1.0.3:
+Ship path for 1.0.3 — build and submit are **done**, see above:
 
 ```bash
-npx eas build -p ios --profile production
-npx eas submit -p ios --profile production
+npx eas build -p ios --profile production     # done: a93dc96c
+npx eas submit -p ios --profile production    # done: 2c9d1438
 ```
 
-Once 1.0.3 is live, `eas update --channel production` resumes as the path for
-JS/asset/copy-only fixes on top of it.
+Once 1.0.3 is live, `eas update --channel production` is the path for
+JS/asset/copy-only fixes on top of it. Note that `--environment production` is
+required alongside `--channel` in non-interactive mode, or the command errors
+out before bundling.
+
+**While 1.0.3 is in App Store review, do not publish anything
+behaviour-changing to the `production` channel.** A reviewer launching build 14
+fetches whatever is on that channel first. Copy and text are fine; anything
+that changes what the app does is not.
 
 ## Pre-Submission Checklist
 
